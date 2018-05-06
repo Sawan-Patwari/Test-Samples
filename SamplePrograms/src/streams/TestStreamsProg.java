@@ -222,12 +222,5 @@ public class TestStreamsProg {
 		.forEach(System.out::println);
 	}
 	
-	static void streamSort1() {
-		Stream<String> s = Stream.of("white", "black");
-		s.sorted().forEach(System.out::println);
-		
-		Stream<String> s1 = Stream.of("white", "black");
-		s1.sorted(Comparator.reverseOrder())
-		.forEach(System.out::println);
-	}
+	
 }
