@@ -1,6 +1,7 @@
 package streams;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -33,6 +34,7 @@ public class TestStreamsProg {
 		streamSkipAndLimit();
 		streamMap();
 		streamFlatMap();
+		streamSort();
 	}
 
 	static void randomNumGen() {
@@ -209,7 +211,14 @@ public class TestStreamsProg {
 		Stream<List<String>> animals = Stream.of(zero, one, two);
 		animals.flatMap(l -> l.stream()).forEach(System.out::println);
 		//animals.flatMap(l -> Stream.of("A")).forEach(System.out::println);
+	}
+	
+	static void streamSort() {
+		Stream<String> s = Stream.of("white", "black");
+		s.sorted().forEach(System.out::println);
 		
-
+		Stream<String> s1 = Stream.of("white", "black");
+		s1.sorted(Comparator.reverseOrder())
+		.forEach(System.out::println);
 	}
 }
