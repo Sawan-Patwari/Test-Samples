@@ -729,28 +729,39 @@ public class TestStreamsProg {
 		 * 
 		 */
 	}
-	/*
-	 * Functional Interfaces for Primitives: BooleanSupplier b1 = () -> true;
-	 * BooleanSupplier b2 = () -> Math.random() > .5;
-	 * System.out.println(b1.getAsBoolean()); System.out.println(b2.getAsBoolean());
-	 * 
-	 * DoubleSupplier IntSupplier LongSupplier DoubleConsumer IntConsumer
-	 * LongConsumer DoublePredicate IntPredicate LongPredicate DoubleFunction<R>
-	 * IntFunction<R> LongFunction<R> DoubleUnaryOperator IntUnaryOperator
-	 * LongUnaryOperator DoubleBinaryOperator IntBinaryOperator LongBinaryOperator
-	 */
-
-	/*
-	 * Primitive-specific functional interfaces: ToDoubleFunction<T>
-	 * ToIntFunction<T> ToLongFunction<T> ToDoubleBiFunction<T, U>
-	 * ToIntBiFunction<T, U> ToLongBiFunction<T, U> DoubleToIntFunction
-	 * DoubleToLongFunction IntToDoubleFunction IntToLongFunction
-	 * LongToDoubleFunction LongToIntFunction ObjDoubleConsumer<T> ObjIntConsumer<T>
-	 * ObjLongConsumer<T>
-	 * 
-	 * Example:
-	 * 
-	 * double d = 2.0; DoubleToIntFunction func = x -> 2; func.applyAsInt(d);
-	 */
+	
 
 }
+
+//**********************
+//Notes: [Start]
+//**********************
+
+/* Note-1:
+ * Functional Interfaces for Primitives: BooleanSupplier b1 = () -> true;
+ * BooleanSupplier b2 = () -> Math.random() > .5;
+ * System.out.println(b1.getAsBoolean()); System.out.println(b2.getAsBoolean());
+ * 
+ * DoubleSupplier IntSupplier LongSupplier DoubleConsumer IntConsumer
+ * LongConsumer DoublePredicate IntPredicate LongPredicate DoubleFunction<R>
+ * IntFunction<R> LongFunction<R> DoubleUnaryOperator IntUnaryOperator
+ * LongUnaryOperator DoubleBinaryOperator IntBinaryOperator LongBinaryOperator
+ */
+
+/* Note-2:
+ * Primitive-specific functional interfaces: ToDoubleFunction<T>
+ * ToIntFunction<T> ToLongFunction<T> ToDoubleBiFunction<T, U>
+ * ToIntBiFunction<T, U> ToLongBiFunction<T, U> DoubleToIntFunction
+ * DoubleToLongFunction IntToDoubleFunction IntToLongFunction
+ * LongToDoubleFunction LongToIntFunction ObjDoubleConsumer<T> ObjIntConsumer<T>
+ * ObjLongConsumer<T>
+ * 
+ * Example:
+ * 
+ * double d = 2.0; DoubleToIntFunction func = x -> 2; func.applyAsInt(d);
+ */
+
+
+//**********************
+//Notes: [End]
+//**********************
