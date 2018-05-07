@@ -1,5 +1,6 @@
 package streams;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -11,6 +12,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
@@ -58,6 +60,12 @@ public class TestStreamsProg {
 		streamIntPrimitives();
 		optionalWithPrimitiveStreams();
 		rangeCalculation();
+		deferredExecution();
+		streamsWithOptionals();
+		checkedExcepWithFISample1();
+		checkedExcepWithFISample2();
+		checkedExcepWithFISample3();
+		chainingOptionals();
 	}
 
 	static void randomNumGen() {
@@ -477,7 +485,250 @@ public class TestStreamsProg {
 		IntSummaryStatistics stats = instream.summaryStatistics();
 		System.out.println(stats.getMax() - stats.getMin());
 	}
+	
+	static void deferredExecution() {
+		System.out.println("************");
+		System.out.println("Method Name:" + "deferredExecution");
+		List<String> counter = new ArrayList<>();
+		counter.add("1");
+		counter.add("2");
+		
+		Stream<String> stream = counter.stream();
+		counter.add("3");
+		counter.add("4");
+		System.out.println(stream.count());
+		counter.add("5");
+		try{
+			System.out.println(stream.count());// a terminal operation.
+		}catch(java.lang.IllegalStateException e) {System.out.println(e);}
+	}
+	
+	static void streamsWithOptionals() {
+		Optional<Integer> optional = Optional.of(1234);
+		printIf4DigitRegular(optional);
+		printIf4DigitWithStreams(optional);
+		
+		Optional<String> optional1 = optional.map(i -> ""+i);
+		Optional<Integer> result = optional1.map(String::length);
+		result.ifPresent(t-> System.out.println("result:"+t));
+		
+	}
+	
+	static void printIf4DigitRegular(Optional<Integer> optional) {
+		if (optional.isPresent()) {
 
+			Integer num = optional.get();
+			String string = "" + num;
+			if (string.length() == 4)
+
+				System.out.println(string);
+		}
+	}
+	
+	static void printIf4DigitWithStreams(Optional<Integer> optional) {
+		optional.map(n -> "" + n)
+		.filter(s -> s.length() == 4)
+		.ifPresent(System.out::println);
+	}
+	
+	static void checkedExcepWithFISample1() {
+		
+		class CheckedExcepWithFI{
+			public List<String> testMethod() throws FileNotFoundException {
+				throw new FileNotFoundException();
+			}
+		}
+		
+		Supplier<List<String>> supplierInst = () -> {
+			try {
+				
+				return new CheckedExcepWithFI().testMethod();
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+		};
+		
+		try {
+			supplierInst.get();
+		}catch(RuntimeException e) {
+			System.out.println(e);
+		}
+		
+	}
+	
+	//Not having dynamic line number to have clean syntax for functional programming code.
+	static void checkedExcepWithFISample2() {
+		
+		class CheckedExcepWithFI {
+			
+			{		
+				System.out.println("Line Number:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+						" Debugging "+this.getClass().getEnclosingMethod()+"(): declaring an inner class - CheckedExcepWithFI inside the method.");
+			}					
+
+			public List<String> testMethod() throws FileNotFoundException {
+				throw new FileNotFoundException();
+			}
+
+			public List<String> getSupplier() {
+				try {
+					return testMethod();
+				} catch (FileNotFoundException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+
+		Supplier<List<String>> supplierInst = () -> {
+			try {
+
+				return new CheckedExcepWithFI().testMethod();
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+		};
+
+		try {
+			supplierInst.get();
+		} catch (RuntimeException e) {
+			System.out.println(e);
+		}
+
+		Supplier<List<String>> supplierInst1 = () -> {
+			System.out.println("Debugging [Line Number]:"+Thread.currentThread().getStackTrace()[1].getLineNumber() +": Block code test.");
+			return new CheckedExcepWithFI().getSupplier();
+		};
+
+		{
+		} // empty block code. Tested the syntax.
+
+		// Also:
+		Supplier<List<String>> supplierInst2 = () -> new CheckedExcepWithFI().getSupplier();
+
+		try {
+			supplierInst1.get();
+		} catch (RuntimeException e) {
+			System.out.println(e);
+		}
+
+		try {
+			supplierInst2.get();
+		} catch (RuntimeException e) {
+			System.out.println(e);
+		}
+
+	}
+		
+	static void checkedExcepWithFISample3() {
+		
+		class CheckedExcepWithFI {
+			
+			{		
+				System.out.println("Line Number:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+						" Debugging "+this.getClass().getEnclosingMethod()+"(): declaring an inner class - CheckedExcepWithFI inside the method.");
+			}		
+			
+			public CheckedExcepWithFI(int lineNumber, String instanceVariableNm) {
+				System.out.println("Line Number: " + lineNumber
+						+ " Instance Variable Declared Name: " + instanceVariableNm
+						);
+			}
+
+			public List<String> testMethod() throws FileNotFoundException {
+				throw new FileNotFoundException();
+			}
+
+			public List<String> getSupplier() {
+				try {
+					return testMethod();
+				} catch (FileNotFoundException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+
+		Supplier<List<String>> supplierInst = () -> {
+			try {
+
+				return new CheckedExcepWithFI(Thread.currentThread().getStackTrace()[1].getLineNumber(), "supplierInst").testMethod();
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+		};
+
+		try {
+			supplierInst.get();
+		} catch (RuntimeException e) {
+			System.out.println(e);
+		}
+
+		Supplier<List<String>> supplierInst1 = () -> {
+			System.out.println("Debugging [Line Number]:"+Thread.currentThread().getStackTrace()[1].getLineNumber() +": Block code test.");
+			return new CheckedExcepWithFI(Thread.currentThread().getStackTrace()[1].getLineNumber(), "supplierInst1").getSupplier();
+		};
+
+		{
+		} // empty block code. Tested the syntax.
+
+		// Also:
+		Supplier<List<String>> supplierInst2 = () -> new CheckedExcepWithFI(Thread.currentThread().getStackTrace()[1].getLineNumber(), "supplierInst3").getSupplier();
+
+		try {
+			supplierInst1.get();
+		} catch (RuntimeException e) {
+			System.out.println(e);
+		}
+
+		try {
+			supplierInst2.get();
+		} catch (RuntimeException e) {
+			System.out.println(e);
+		}
+
+	}
+	
+	static class ChainingOptionals {// static class because there is at least one static method.
+		public static Optional<Integer> computeLength(String s) {
+			if(s!= null) {
+				return Optional.of(s.length());
+			}else {
+				return Optional.of(0);
+			}
+		}
+
+	}
+	
+	static void chainingOptionals() {
+		System.out.println("Inside chainingOptionals().");
+		//static class ChainingOptionals {//Not permitted within a method.
+		class ChainingOptionals1 {// local classes cannot be static.
+			//public static Optional<Integer> computeLength(String s) { //Cannot do this.
+			public Optional<Integer> computeLength(String s) {
+				if(s!= null) {
+					return Optional.of(s.length());
+				}else {
+					return Optional.of(0);
+				}
+			}
+
+		}
+		Optional<String> name = Optional.of("Sawan.Patwari");
+		
+		Optional<Integer> nameLength1 = name.flatMap(
+				ChainingOptionals::computeLength);
+		nameLength1.ifPresent(l -> System.out.println(l));
+		
+		Optional<Integer> nameLength2 = name.flatMap(
+				s -> new ChainingOptionals1().computeLength(s)				
+				);
+		nameLength2.ifPresent(l -> System.out.println(l));	
+		
+		/*
+		 * Note: The map() method adds another Optional , giving us
+		 * Optional<Optional<Integer>>; thus, have to use flatMap.
+		 * 
+		 */
+	}
 	/*
 	 * Functional Interfaces for Primitives: BooleanSupplier b1 = () -> true;
 	 * BooleanSupplier b2 = () -> Math.random() > .5;
