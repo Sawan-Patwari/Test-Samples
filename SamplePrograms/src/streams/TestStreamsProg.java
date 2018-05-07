@@ -6,11 +6,14 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.IntSummaryStatistics;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -66,6 +69,10 @@ public class TestStreamsProg {
 		checkedExcepWithFISample2();
 		checkedExcepWithFISample3();
 		chainingOptionals();
+		CollectorsSample.joining();
+		CollectorsSample.averagingInt();
+		CollectorsSample.toCollection();
+		CollectorsSample.toMap();
 	}
 
 	static void randomNumGen() {
@@ -728,6 +735,71 @@ public class TestStreamsProg {
 		 * Optional<Optional<Integer>>; thus, have to use flatMap.
 		 * 
 		 */
+	}
+	
+	static class CollectorsSample {
+		
+		static void joining() {
+			System.out.println("Inside the method: CollectorsSample.joining()");
+			Stream<String> streamSample = Stream.of("1", "2", "3");
+			String result = streamSample.collect(Collectors.joining(", "));
+			System.out.println(result);
+			/*Similar functions:
+			 * 	Collectors.joining()
+			 */
+		}
+		
+		static void averagingInt() {
+			Stream<String> streamSample = Stream.of("Mango", "Banana", "Pineapple");
+			Double result = streamSample.collect(Collectors.averagingInt(String::length));
+			System.out.println(result);
+			
+			/*Similar functions from Collectors:
+			 * 	averagingDouble(ToDoubleFunction f); averagingLong(ToLongFunction f)
+			 */
+		}
+		
+		static void toCollection() {
+			Stream<String> streamSample = Stream.of("titan", "tigers", "bears", "tennis");
+			TreeSet<String> result = streamSample.filter(s -> s.startsWith("t"))
+			.collect(Collectors.toCollection(TreeSet::new));
+			System.out.println(result);
+			
+			/*
+			 * Note: Also check Collectors.toList() and Collectors.toSet()
+			 */
+		}
+		
+		static void toMap() {
+			Stream<String> streamSample = Stream.of("titan", "tigers", "bears", "tennis");
+			Map<String, Integer> map = streamSample.collect(
+			Collectors.toMap(s -> s, String::length));
+			System.out.println(map);
+			
+			Stream<String> streamSample1 = Stream.of("titan", "tigers", "bears", "tennis");
+			Map<String, Integer> map1 = streamSample1.collect(
+			Collectors.toMap(Function.identity(), String::length));
+			System.out.println(map1);
+			
+			System.out.println("streamSample2:");
+			Stream<String> streamSample2 = Stream.of("titan", "tigers", "bears", "tennis", "edge");
+			Map<Integer, String> map2 = streamSample2.collect(Collectors.toMap(
+			String::length, k -> k, (s1, s2) -> s1 + "," + s2));
+			System.out.println(map2); 
+			
+			Stream<String> streamSample3 = Stream.of("lions", "tigers", "bears");
+			TreeMap<Integer, String> map3 = streamSample3.collect(Collectors.toMap(
+			String::length, k -> k, (s1, s2) -> s1 + "," + s2, TreeMap::new));
+			System.out.println(map3);
+			
+			/*
+			 * Note: Take a look at the toMap APIs' function definitions.
+			 */
+			
+		}
+		
+		
+		
 	}
 	
 
