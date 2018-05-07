@@ -3,6 +3,7 @@ package streams;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -11,9 +12,16 @@ import java.util.TreeSet;
 import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+/**
+ * 
+ * @author Sawan.Patwari
+ *
+ */
 public class TestStreamsProg {
 
 	public static void main(String[] args) {
@@ -48,6 +56,8 @@ public class TestStreamsProg {
 		printStreamDiffWays2();
 		printStreamDiffWays3();
 		streamIntPrimitives();
+		optionalWithPrimitiveStreams();
+		rangeCalculation();
 	}
 
 	static void randomNumGen() {
@@ -318,73 +328,59 @@ public class TestStreamsProg {
 		 * infinite stream.
 		 * 
 		 */
-		Stream.generate(() -> "1234").filter(n -> n.length() == 4).
-										sorted().
-										limit(2).
-										forEach(System.out::println);
-		
+		Stream.generate(() -> "1234").filter(n -> n.length() == 4).sorted().limit(2).forEach(System.out::println);
+
 	}
-	
+
 	static void fixForNeverCallThisMethod1() {
-		Stream.generate(() -> "1234")
-		.filter(n -> n.length() == 4)
-		.limit(2)
-		.sorted()
-		.forEach(System.out::println);
+		Stream.generate(() -> "1234").filter(n -> n.length() == 4).limit(2).sorted().forEach(System.out::println);
 	}
-	
+
 	static void neverCallThisMethod2() {
 		/*
-		 *  This one hangs as well until we kill the program. The filter doesn’t allow anything
-			through, so limit() never sees two elements. This means that we have to keep waiting and
-			hope that they show up.
+		 * This one hangs as well until we kill the program. The filter doesn’t allow
+		 * anything through, so limit() never sees two elements. This means that we have
+		 * to keep waiting and hope that they show up.
 		 */
-		Stream.generate(() -> "123456")
-		.filter(n -> n.length() == 4)
-		.limit(2)
-		.sorted()
-		.forEach(System.out::println);
-		
+		Stream.generate(() -> "123456").filter(n -> n.length() == 4).limit(2).sorted().forEach(System.out::println);
+
 	}
-	
+
 	static void streamIterate() {
 		Stream<Integer> infinite = Stream.iterate(1, x -> x + 1);
-		infinite.filter(x -> x % 2 == 1)
-		.limit(5)
-		.forEach(System.out::print);
+		infinite.filter(x -> x % 2 == 1).limit(5).forEach(System.out::print);
 	}
-	
+
 	static void printStreamDiffWays() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "printStreamDiffWays");
 		Stream<List<?>> stream = getStreamSample();
-		stream.forEach(System.out::println);		
+		stream.forEach(System.out::println);
 	}
-	
+
 	static void printStreamDiffWays1() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "printStreamDiffWays1");
 		Stream<List<?>> stream = getStreamSample();
-		System.out.println(stream.collect(Collectors.
-				toList()));		
+		System.out.println(stream.collect(Collectors.toList()));
 	}
-	
+
 	static void printStreamDiffWays2() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "printStreamDiffWays2");
-		//Stream<String> stream = Stream.of("1","2","3","4");//didn't work.
-		Stream<List<?>> stream = getStreamSample();//didn't work.
-		stream.peek(System.out::println).count();//didn't work.		
+		// Stream<String> stream = Stream.of("1","2","3","4");//didn't work.
+		Stream<List<?>> stream = getStreamSample();// didn't work.
+		stream.peek(System.out::println).count();// didn't work.
 	}
-	
+
 	static void printStreamDiffWays3() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "printStreamDiffWays3");
-		Stream<String> stream = Stream.of("1","2","3","4");
+		Stream<String> stream = Stream.of("1", "2", "3", "4");
 		stream.limit(5).forEach(System.out::println);
 	}
-	
-	static Stream<List<?>> getStreamSample(){
+
+	static Stream<List<?>> getStreamSample() {
 		List<Integer> numbers = new ArrayList<>();
 		List<Character> letters = new ArrayList<>();
 		numbers.add(1);
@@ -395,23 +391,115 @@ public class TestStreamsProg {
 		letters.add('c');
 		letters.add('d');
 		Stream<List<?>> stream = Stream.of(numbers, letters);
-		
+
 		return stream;
 	}
-	
+
 	static void streamIntPrimitives() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "streamIntPrimitives");
 		Stream<Integer> stream = Stream.of(1, 2, 3);
 		System.out.println(stream.reduce(0, (s, n) -> s + n));
-		
+
 		Stream<Integer> stream2 = Stream.of(1, 2, 3);
 		System.out.println(stream2.mapToInt(x -> x).sum());
-		
+
 		IntStream intStream = IntStream.of(1, 2, 3);
 		OptionalDouble avg = intStream.average();
 		System.out.println(avg.getAsDouble());
-		
+		/*
+		 * Three types of primitive streams: IntStream : Used for the primitive types
+		 * int , short , byte , and char LongStream : Used for the primitive type long
+		 * DoubleStream : Used for the primitive types double and float
+		 */
+		DoubleStream oneValue = DoubleStream.of(18.90);
+		DoubleStream varargs = DoubleStream.of(2.0, 2.1, 1.2);
+		oneValue.forEach(System.out::println);
+		System.out.println(oneValue);
+		// System.out.println(ToStringBuilder.reflectionToString(oneValue));
+		varargs.forEach(System.out::println);
+		DoubleStream empty = DoubleStream.empty();
+
+		DoubleStream random = DoubleStream.generate(Math::random);
+		DoubleStream fractions = DoubleStream.iterate(.5, d -> d / 3);
+		random.limit(3).forEach(System.out::println);
+		System.out.println();
+		fractions.limit(3).forEach(System.out::println);
+
+		System.out.println("IntStream.iterate(1, n -> n+1):");
+		IntStream intStream1 = IntStream.iterate(1, n -> n + 1).limit(5);
+		intStream1.forEach(System.out::println);
+
+		System.out.println("IntStream.range(1, 10):");
+		IntStream range = IntStream.range(1, 10);
+		range.forEach(System.out::println);
+
+		System.out.println("IntStream.rangeClosed(1, 5):");
+		IntStream rangeClosed = IntStream.rangeClosed(1, 5);
+		rangeClosed.forEach(System.out::println);
+
+		Stream<String> objStream = Stream.of("123", "22");
+		IntStream intStream3 = objStream.mapToInt(s -> s.length());
+
+		List<String> list = Arrays.asList("123", "22");
+		IntStream ints = list.stream().flatMapToInt(x -> IntStream.of(Integer.valueOf(x)));
+		// java.util.stream.ReferencePipeline
+		System.out.println(ints);// Eclipse not providing interface implementer classes list.
+		ints.forEach(System.out::println);
+
 	}
+
+	static void optionalWithPrimitiveStreams() {
+		System.out.println("************");
+		System.out.println("Method Name:" + "optionalWithPrimitiveStreams");
+		IntStream stream = IntStream.rangeClosed(1, 20);
+		OptionalDouble optional = stream.average();
+		optional.ifPresent(System.out::println);
+		System.out.println(optional.getAsDouble());
+		System.out.println(optional.orElseGet(() -> Double.NaN));
+
+		LongStream longs = LongStream.of(15, 10);
+		long sum = longs.sum();
+		System.out.println(sum); // 15
+
+		// OptionalDouble OptionalInt OptionalLong
+	}
+
+	/**
+	 * IntSummaryStatistics includes the following calculations - minimum, maximum,
+	 * average, size, and the number of values in the stream. Helpful because We
+	 * can’t run two terminal operations against the same stream.
+	 */
+	static void rangeCalculation() {
+		System.out.println("************");
+		System.out.println("Method Name:" + "rangeCalculation");
+		IntStream instream = IntStream.of(15, 10, 20, 1, 29, 91);
+		IntSummaryStatistics stats = instream.summaryStatistics();
+		System.out.println(stats.getMax() - stats.getMin());
+	}
+
+	/*
+	 * Functional Interfaces for Primitives: BooleanSupplier b1 = () -> true;
+	 * BooleanSupplier b2 = () -> Math.random() > .5;
+	 * System.out.println(b1.getAsBoolean()); System.out.println(b2.getAsBoolean());
+	 * 
+	 * DoubleSupplier IntSupplier LongSupplier DoubleConsumer IntConsumer
+	 * LongConsumer DoublePredicate IntPredicate LongPredicate DoubleFunction<R>
+	 * IntFunction<R> LongFunction<R> DoubleUnaryOperator IntUnaryOperator
+	 * LongUnaryOperator DoubleBinaryOperator IntBinaryOperator LongBinaryOperator
+	 */
+
+	/*
+	 * Primitive-specific functional interfaces: ToDoubleFunction<T>
+	 * ToIntFunction<T> ToLongFunction<T> ToDoubleBiFunction<T, U>
+	 * ToIntBiFunction<T, U> ToLongBiFunction<T, U> DoubleToIntFunction
+	 * DoubleToLongFunction IntToDoubleFunction IntToLongFunction
+	 * LongToDoubleFunction LongToIntFunction ObjDoubleConsumer<T> ObjIntConsumer<T>
+	 * ObjLongConsumer<T>
+	 * 
+	 * Example:
+	 * 
+	 * double d = 2.0; DoubleToIntFunction func = x -> 2; func.applyAsInt(d);
+	 */
 
 }
