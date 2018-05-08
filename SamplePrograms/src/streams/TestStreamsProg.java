@@ -73,6 +73,11 @@ public class TestStreamsProg {
 		CollectorsSample.averagingInt();
 		CollectorsSample.toCollection();
 		CollectorsSample.toMap();
+		CollectorsSample.summarizingInt();
+		CollectorsSample.summingInt();
+		CollectorsSample.counting();
+		CollectorsSample.getMaxAndMinBy();
+		CollectorsSample.groupingBy();		
 	}
 
 	static void randomNumGen() {
@@ -433,6 +438,7 @@ public class TestStreamsProg {
 		System.out.println(oneValue);
 		// System.out.println(ToStringBuilder.reflectionToString(oneValue));
 		varargs.forEach(System.out::println);
+		@SuppressWarnings("unused")
 		DoubleStream empty = DoubleStream.empty();
 
 		DoubleStream random = DoubleStream.generate(Math::random);
@@ -454,6 +460,7 @@ public class TestStreamsProg {
 		rangeClosed.forEach(System.out::println);
 
 		Stream<String> objStream = Stream.of("123", "22");
+		@SuppressWarnings("unused")
 		IntStream intStream3 = objStream.mapToInt(s -> s.length());
 
 		List<String> list = Arrays.asList("123", "22");
@@ -738,10 +745,12 @@ public class TestStreamsProg {
 	}
 	
 	static class CollectorsSample {
+		static String[] stringValues = {"lions", "tigers", "bears", 
+				"Godzilla", "Vampire", "Elephant", "Humans", "Apes", "Monkeys"};
 		
 		static void joining() {
 			System.out.println("Inside the method: CollectorsSample.joining()");
-			Stream<String> streamSample = Stream.of("1", "2", "3");
+			Stream<String> streamSample = Stream.of(stringValues);
 			String result = streamSample.collect(Collectors.joining(", "));
 			System.out.println(result);
 			/*Similar functions:
@@ -750,17 +759,18 @@ public class TestStreamsProg {
 		}
 		
 		static void averagingInt() {
-			Stream<String> streamSample = Stream.of("Mango", "Banana", "Pineapple");
+			Stream<String> streamSample = Stream.of(stringValues);
 			Double result = streamSample.collect(Collectors.averagingInt(String::length));
 			System.out.println(result);
 			
-			/*Similar functions from Collectors:
+			/* Current usage: Collectors.averagingInt(ToIntFunction<? super String> mapper)
+			 * Similar functions from Collectors:
 			 * 	averagingDouble(ToDoubleFunction f); averagingLong(ToLongFunction f)
 			 */
 		}
 		
 		static void toCollection() {
-			Stream<String> streamSample = Stream.of("titan", "tigers", "bears", "tennis");
+			Stream<String> streamSample = Stream.of(stringValues);
 			TreeSet<String> result = streamSample.filter(s -> s.startsWith("t"))
 			.collect(Collectors.toCollection(TreeSet::new));
 			System.out.println(result);
@@ -771,23 +781,23 @@ public class TestStreamsProg {
 		}
 		
 		static void toMap() {
-			Stream<String> streamSample = Stream.of("titan", "tigers", "bears", "tennis");
+			Stream<String> streamSample = Stream.of(stringValues);
 			Map<String, Integer> map = streamSample.collect(
 			Collectors.toMap(s -> s, String::length));
 			System.out.println(map);
 			
-			Stream<String> streamSample1 = Stream.of("titan", "tigers", "bears", "tennis");
+			Stream<String> streamSample1 = Stream.of(stringValues);
 			Map<String, Integer> map1 = streamSample1.collect(
 			Collectors.toMap(Function.identity(), String::length));
 			System.out.println(map1);
 			
 			System.out.println("streamSample2:");
-			Stream<String> streamSample2 = Stream.of("titan", "tigers", "bears", "tennis", "edge");
+			Stream<String> streamSample2 = Stream.of(stringValues);
 			Map<Integer, String> map2 = streamSample2.collect(Collectors.toMap(
 			String::length, k -> k, (s1, s2) -> s1 + "," + s2));
 			System.out.println(map2); 
 			
-			Stream<String> streamSample3 = Stream.of("lions", "tigers", "bears");
+			Stream<String> streamSample3 = Stream.of(stringValues);
 			TreeMap<Integer, String> map3 = streamSample3.collect(Collectors.toMap(
 			String::length, k -> k, (s1, s2) -> s1 + "," + s2, TreeMap::new));
 			System.out.println(map3);
@@ -798,8 +808,160 @@ public class TestStreamsProg {
 			
 		}
 		
+		static void summarizingInt() {
+			System.out.println("Inside CollectorsSample.summarizingInt():");
+			Stream<String> streamSample = Stream.of(stringValues);
+			IntSummaryStatistics intSummaryStats = streamSample.collect(Collectors.summarizingInt(String::length));
+			System.out.println(intSummaryStats);
+			/*
+			 * Similar functions: 
+			 * summarizingDouble(ToDoubleFunction f)
+			 * summarizingLong(ToLongFunction f)
+			 */
+		}
 		
+		static void summingInt() {
+			System.out.println("Inside CollectorsSample.summingInt():");
+			Stream<String> streamSample = Stream.of(stringValues);
+			Integer sum = streamSample.collect(Collectors.summingInt(String::length));
+			System.out.println(sum);
+			
+			/*
+			 * Similar functions: 
+			 * summingDouble(ToDoubleFunction f) 
+			 * summingLong(ToLongFunction f)
+			 */
+		}
 		
+		static void counting() {
+			System.out.println("Inside CollectorsSample.counting():");
+			Stream<String> streamSample = Stream.of(stringValues);
+			Long sum = streamSample.collect(Collectors.counting());
+			System.out.println(sum);
+		}
+		
+		static void getMaxAndMinBy() {
+			System.out.println("Inside CollectorsSample.getMaxAndMinBy():");
+			
+			//Comparator<String> ascendingOrder = (s1, s2) -> s1.compareTo(s2);
+			Comparator<String> ascendingOrder = Comparator.naturalOrder();
+
+			Optional<String> last1 = Stream.of(stringValues).collect(Collectors.maxBy(ascendingOrder));
+			last1.ifPresent(l -> {
+				System.out.print("Ascending order's Last String:");
+				System.out.println(l);
+			});
+			
+			Optional<String> first1 = Stream.of(stringValues).collect(Collectors.minBy(ascendingOrder));
+			first1.ifPresent(l -> {
+				System.out.print("Ascending order's First String:");
+				System.out.println(l);
+			});
+
+			Optional<String> last2 = Stream.of(stringValues).collect(Collectors.maxBy(ascendingOrder.reversed()));
+			last2.ifPresent(l -> {
+				System.out.print("Descending Order's Last String:");
+				System.out.println(l);
+			});
+			
+			Optional<String> first2 = Stream.of(stringValues).collect(Collectors.minBy(ascendingOrder.reversed()));
+			first2.ifPresent(l -> {
+				System.out.print("Descending Order's First String:");
+				System.out.println(l);
+			});
+
+		}
+		
+		static void groupingBy() {
+			System.out.println("Inside CollectorsSample.groupingBy():");
+			
+			Stream<String> streamSample = Stream.of(stringValues);
+			
+			System.out.println("API-1 Grouping:");
+			Map<Integer, List<String>> map = 
+					streamSample.collect(Collectors.groupingBy(String::length));
+			System.out.println(map);
+			
+			System.out.println("API-2 Grouping:");
+			String[] stringValues = { "lions", "lions", "tigers", "bears", "Godzilla",
+					"Vampire", "Elephant", "Humans", "Apes", "Monkeys" };
+			Stream<String> streamSample1 = Stream.of(stringValues);
+			Map<Integer, Set<String>> map1 = streamSample1.collect(
+					Collectors.groupingBy(String::length, Collectors.toSet()));
+			System.out.println(map1);
+
+			System.out.println("API-3 Grouping:");
+			Stream<String> streamSample2 = Stream.of(stringValues);
+			TreeMap<Integer, Set<String>> map2 = streamSample2.collect(
+			Collectors.groupingBy(String::length, TreeMap::new, Collectors.toSet()));
+			System.out.println(map2);
+			
+			Stream<String> streamSample3 = Stream.of(stringValues);
+			TreeMap<Integer, List<String>> map3 = streamSample3.collect(
+			Collectors.groupingBy(String::length, TreeMap::new, Collectors.toList()));
+			System.out.println(map3);
+			
+			System.out.println("API-4 Grouping:");
+			Stream<String> streamSample4 = Stream.of(stringValues);
+			Map<Integer, Long> map4 = streamSample4.collect(Collectors.groupingBy(
+					String::length, Collectors.counting()));
+			System.out.println(map4);
+			
+			class GroupingAndMappingSamples{
+				{System.out.println("GroupingAndMappingSamples Output: [Start]");}
+				
+				@SuppressWarnings("unused")
+				Object mapping1 = new Object() {
+					
+					Map<Integer, Optional<String>> map = Stream.of(stringValues).collect
+							(
+								Collectors.groupingBy
+								(
+										
+								String::length,
+								
+								Collectors.mapping(
+										
+										s -> { return s.charAt(0)+ " "+" Mapped";},
+										
+										Collectors.minBy(Comparator.naturalOrder())
+													
+												  )					
+								)
+							
+							);
+					
+					{System.out.println(map);}
+					
+				};
+				
+				@SuppressWarnings("unused")
+				Object mapping2 = new Object() {
+					//output same as regular grouping-by API usage without mapping.
+					Map<Integer, List<String>> map = Stream.of(stringValues).collect
+							(
+								Collectors.groupingBy
+								(
+										
+								String::length,
+								Collectors.mapping(
+										
+										s -> s,										
+										Collectors.toList()
+													
+												  )
+												
+								)
+							
+							);
+					{System.out.println(map);}
+										
+				};
+				{System.out.println("GroupingAndMappingSamples Output: [End]");}
+			}
+			
+			new GroupingAndMappingSamples();			
+		}
 	}
 	
 
@@ -833,6 +995,48 @@ public class TestStreamsProg {
  * double d = 2.0; DoubleToIntFunction func = x -> 2; func.applyAsInt(d);
  */
 
+/*
+ * Collector API is useful. Below is the quick list - 
+ * 1. Set-1:
+ * 		averagingDouble(ToDoubleFunction f)
+ * 		averagingInt(ToIntFunction f)
+ * 		averagingLong(ToLongFunction f)
+ * 
+ * 2. Set-2:
+ * 		counting()
+ * 3. Set-3:
+ * 		groupingBy(Function f)
+ * 		groupingBy(Function f, Collector dc)
+ * 		groupingBy(Function f, Supplier s, Collector dc)
+ * 4. Set-4:
+ * 		joining()
+ * 		joining(CharSequence cs)
+ * 5. Set-5:
+ * 		maxBy(Comparator c)
+ * 		minBy(Comparator c)
+ * 6. Set-6:
+ * 		mapping(Function f, Collector dc)
+ * 7. Set-7:
+ * 		partitioningBy(Predicate p)
+ * 		partitioningBy(Predicate p, Collector dc)
+ * 8. Set-8:
+ * 		summarizingDouble(ToDoubleFunction f)
+ * 		summarizingInt(ToIntFunction f)
+ * 		summarizingLong(ToLongFunction f)
+ * 9. Set-9:
+ * 		summingDouble(ToDoubleFunction f)
+ * 		summingInt(ToIntFunction f)
+ * 		summingLong(ToLongFunction f)
+ * 10. Set-10:
+ * 		toList()
+ * 		toSet()
+ * 11. Set-11:
+ * 		toCollection(Supplier s)
+ * 12. Set-12:
+ * 		toMap(Function k, Function v)
+ * 		toMap(Function k, Function v, BinaryOperator m)
+ * 		toMap(Function k, Function v, BinaryOperator m, Supplier s)
+ */
 
 //**********************
 //Notes: [End]
