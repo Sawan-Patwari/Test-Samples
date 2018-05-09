@@ -3,6 +3,7 @@ package streams;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -78,6 +79,7 @@ public class TestStreamsProg {
 		CollectorsSample.counting();
 		CollectorsSample.getMaxAndMinBy();
 		CollectorsSample.groupingBy();		
+		CollectorsSample.partitioning();
 	}
 
 	static void randomNumGen() {
@@ -931,13 +933,14 @@ public class TestStreamsProg {
 							
 							);
 					
-					{System.out.println(map);}
+					{System.out.println("mapping1: "+map);}
 					
 				};
 				
 				@SuppressWarnings("unused")
 				Object mapping2 = new Object() {
 					//output same as regular grouping-by API usage without mapping.
+					//Sorting of the values in the map cannot be done as part of 'Collectors.groupingBy'.
 					Map<Integer, List<String>> map = Stream.of(stringValues).collect
 							(
 								Collectors.groupingBy
@@ -954,13 +957,34 @@ public class TestStreamsProg {
 								)
 							
 							);
-					{System.out.println(map);}
+					{System.out.println("mapping2: "+map);}
 										
-				};
+				};				
+				
 				{System.out.println("GroupingAndMappingSamples Output: [End]");}
 			}
 			
 			new GroupingAndMappingSamples();			
+		}
+		
+		static void partitioning() {
+			System.out.println("Inside CollectorsSample.partitioning():");
+			
+			System.out.println("partitioning() sample-1:");
+			Map<Boolean, List<String>> map = Stream.of(stringValues).collect(
+					Collectors.partitioningBy(s -> s.length() <= 6));
+			System.out.println(map);
+			
+			System.out.println("partitioning() sample-2:");
+			Map<Boolean, List<String>> map1 = Stream.of(stringValues).collect(
+					Collectors.partitioningBy(s -> s.length() <= 6, Collectors.toList()));
+			System.out.println(map1);
+			
+			System.out.println("partitioning() sample-3:");
+			Map<Boolean, Set<String>> map2 = Stream.of(stringValues).collect(
+					Collectors.partitioningBy(s -> s.length() <= 6, Collectors.toSet()));
+			System.out.println(map2);
+			
 		}
 	}
 	
@@ -995,7 +1019,7 @@ public class TestStreamsProg {
  * double d = 2.0; DoubleToIntFunction func = x -> 2; func.applyAsInt(d);
  */
 
-/*
+/*Note-3:
  * Collector API is useful. Below is the quick list - 
  * 1. Set-1:
  * 		averagingDouble(ToDoubleFunction f)
@@ -1036,6 +1060,19 @@ public class TestStreamsProg {
  * 		toMap(Function k, Function v)
  * 		toMap(Function k, Function v, BinaryOperator m)
  * 		toMap(Function k, Function v, BinaryOperator m, Supplier s)
+ */
+
+/*
+ * Note-4:
+ * ■ ■ Supplier<T> : Method get() returns T 
+ * ■ ■ Consumer<T> : Method accept(T t) returns void 
+ * ■ ■ BiConsumer<T> : Method accept(T t, U u) returns void 
+ * ■ ■ Predicate<T> : Method test(T t) returns boolean 
+ * ■ ■ BiPredicate<T> : Method test(T t, U u) returns boolean
+ * ■ ■ Function<T, R> : Method apply(T t) returns R 
+ * ■ ■ BiFunction<T, U, R> : Method apply(T t, U u) returns R
+ * ■ ■ UnaryOperator<T> : Method apply(T t) returns T
+ * ■ ■ BinaryOperator<T> : Method apply(T t1, T t2) returns T
  */
 
 //**********************
