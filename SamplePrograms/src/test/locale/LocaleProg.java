@@ -67,7 +67,7 @@ public class LocaleProg {
 		@SuppressWarnings("unused")
 		Object numberFormatingType2 = new Object() {
 			
-			class FormatNumber implements Display, Format {
+			class FormatNumber implements Format, Display {
 				private final double number = 1_23_456.789;//same as 1,23,456.789
 				private Locale locale = Locale.getDefault();
 				
@@ -97,7 +97,7 @@ public class LocaleProg {
 		@SuppressWarnings("unused")
 		Object currencyFormatingType2 = new Object() {
 						
-			class FormatCurrency implements Display {
+			class FormatCurrency implements Format, Display {
 				private final double amount = 9_46_789.789;
 				private Locale locale = Locale.getDefault();
 				
