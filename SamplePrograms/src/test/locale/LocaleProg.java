@@ -67,17 +67,25 @@ public class LocaleProg {
 		@SuppressWarnings("unused")
 		Object numberFormatingType2 = new Object() {
 			
-			class FormatNumber implements Display {
-				static final double number = 1_23_456.789;//same as 1,23,456.789
+			class FormatNumber implements Display, Format {
+				private final double number = 1_23_456.789;//same as 1,23,456.789
+				private Locale locale = Locale.getDefault();
 				
 				public void display(String asPerWhichCountry, Locale locale){
 					
+					this.locale = locale;
+					
 					System.out.print(asPerWhichCountry);
-					System.out.println(NumberFormat.getInstance(locale).format(number));
+					System.out.println(doFormat());
 				}
+				
 				public void doDisplay() {
-					System.out.println("Number Formating Samples for the number:"+FormatNumber.number);
+					System.out.println("Number Formating Samples for the number:"+number);
 					doCommonDisplay();
+				}
+				
+				public String doFormat() {
+					return NumberFormat.getInstance(locale).format(number);
 				}
 			}
 
@@ -90,17 +98,24 @@ public class LocaleProg {
 		Object currencyFormatingType2 = new Object() {
 						
 			class FormatCurrency implements Display {
-				static final double amount = 9_46_789.789;
+				private final double amount = 9_46_789.789;
+				private Locale locale = Locale.getDefault();
 				
 				public void display(String asPerWhichCountry, Locale locale){
 					
+					this.locale = locale;
+					
 					System.out.print(asPerWhichCountry);
-					System.out.println(NumberFormat.getCurrencyInstance(locale).format(amount));
+					System.out.println(doFormat());
 				}
 				
 				public void doDisplay() {
-					System.out.println("Currency Formating Samples for the amount:"+FormatCurrency.amount);	
+					System.out.println("Currency Formating Samples for the amount:"+amount);	
 					doCommonDisplay();
+				}
+				
+				public String doFormat() {
+					return NumberFormat.getCurrencyInstance(locale).format(amount);
 				}
 				
 			}
@@ -127,4 +142,8 @@ interface Display {
 	}
 	
 	void doDisplay();
+}
+
+interface Format {
+	String doFormat();	
 }
