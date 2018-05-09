@@ -3,7 +3,6 @@ package streams;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -746,6 +745,7 @@ public class TestStreamsProg {
 		 */
 	}
 	
+	//Nested classes can be static.
 	static class CollectorsSample {
 		static String[] stringValues = {"lions", "tigers", "bears", 
 				"Godzilla", "Vampire", "Elephant", "Humans", "Apes", "Monkeys"};
@@ -909,6 +909,7 @@ public class TestStreamsProg {
 					String::length, Collectors.counting()));
 			System.out.println(map4);
 			
+			//Local classes (classes within methods of a class) cannot be static.
 			class GroupingAndMappingSamples{
 				{System.out.println("GroupingAndMappingSamples Output: [Start]");}
 				
@@ -1075,6 +1076,11 @@ public class TestStreamsProg {
  * ■ ■ BinaryOperator<T> : Method apply(T t1, T t2) returns T
  */
 
+/*
+ * Note-5: Nested classes can be static (which means this class can have static methods). 
+ * But, local classes (classes with methods of another class) 
+ * cannot be static (which means this class cannot have static methods). 
+ */
 //**********************
 //Notes: [End]
 //**********************
