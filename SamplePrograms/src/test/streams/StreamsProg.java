@@ -1,4 +1,4 @@
-package streams;
+package test.streams;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  * @author Sawan.Patwari
  *
  */
-public class TestStreamsProg {
+public class StreamsProg {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub

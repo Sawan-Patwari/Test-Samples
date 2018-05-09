@@ -1,9 +1,9 @@
-package dateTimeApi;
+package test.dateTime;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 
-public class TestDateTimeAPIProg {
+public class DateTimeProg {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
