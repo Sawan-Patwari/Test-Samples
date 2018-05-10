@@ -1,4 +1,4 @@
-package test.locale;
+package favouritePackage;
 
 import java.text.NumberFormat;
 import java.util.Locale;
