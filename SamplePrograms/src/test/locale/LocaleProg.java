@@ -242,13 +242,13 @@ public class LocaleProg {
 		
 		LocalTime time;
 		try {
-			time = LocalTime.parse("9:10");			
+			time = LocalTime.parse("4:25");			
 			System.out.println(time);		
 		}catch(Exception e) {
 			System.out.println(e);
 		}
 		
-		time = LocalTime.parse("09:10");			
+		time = LocalTime.parse("04:25");			
 		System.out.println(time);
 	}
 
