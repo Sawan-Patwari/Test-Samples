@@ -1,5 +1,6 @@
 package test.resourceBundle;
 
+import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Locale;
@@ -28,8 +29,12 @@ public class ResourceBundleProg {
 		
 		static void displayStatus(Locale locale) {
 			ResourceBundle rb = ResourceBundle.getBundle("test.resourceBundle.Museum", locale);
-			System.out.println(rb.getString("hello"));
-			System.out.println(rb.getString("open"));
+			
+			String hello = rb.getString("hello");
+			String museumStatus = rb.getString("status");
+			
+			System.out.println(MessageFormat.format(hello, "Sawan.Patwari"));
+			System.out.println(museumStatus);
 		}
 		
 		static void currentStatus() {
