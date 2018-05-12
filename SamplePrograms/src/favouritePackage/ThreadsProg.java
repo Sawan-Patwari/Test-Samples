@@ -20,9 +20,35 @@ public class ThreadsProg extends Thread implements Runnable {
 		// TODO Auto-generated method stub
 
 		/*
-		 * Observation: Seems like the 'main' method call is not synchronized all
-		 * the time.
+		 * Observation: Seems like the 'main' method call is not synchronized all the
+		 * time.
 		 */
+		doBasicTest(args);
+
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+
+		main(null);// I am calling main.
+
+		// All remaining sample code testing will be done here because I want to execute
+		// the test code only once and this cannot be achieved if I code it in the
+		// 'main' method.
+
+	}
+
+	static {
+		Runnable x = () -> {
+			new ThreadsProg().start();
+		};
+
+		MyLambdaAPI.doSampleTest(x);
+	}
+
+	static void doBasicTest(String[] args) {
+
 		if (Objects.isNull(args))
 			System.out.println("I called main.");
 		else
@@ -41,21 +67,6 @@ public class ThreadsProg extends Thread implements Runnable {
 		});
 
 		// running lambda API.
-		MyLambdaAPI.doSampleTest(x);
-
-	}
-
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		main(null);// I am calling main.
-	}
-
-	static {
-		Runnable x = () -> {
-			new ThreadsProg().start();
-		};
-
 		MyLambdaAPI.doSampleTest(x);
 	}
 
