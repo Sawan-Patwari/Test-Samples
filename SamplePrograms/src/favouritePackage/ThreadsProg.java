@@ -20,7 +20,7 @@ public class ThreadsProg extends Thread implements Runnable {
 		// TODO Auto-generated method stub
 
 		/*
-		 * Observation: Seems like the the 'main' method call is not synchronized all
+		 * Observation: Seems like the 'main' method call is not synchronized all
 		 * the time.
 		 */
 		if (Objects.isNull(args))
