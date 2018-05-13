@@ -1,5 +1,10 @@
 package test.threads;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 public class ThreadPollingSampleProg {
 
 	private static boolean wait;
@@ -9,6 +14,8 @@ public class ThreadPollingSampleProg {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
+		doBooleanWaitTestWithFix();
+		doWaitTestWithExecutors();
 		doCounterWaitTestWithFix();
 	}
 
@@ -65,9 +72,8 @@ public class ThreadPollingSampleProg {
 	}
 
 	/**
-	 * This function also hangs. Do not call this method.
-	 */
-	@Deprecated
+	 * 
+	 */	
 	public static void doBooleanWaitTestWithFix() {
 		try {
 			System.out.println("Thread Polling Sample Test: [Starts]");
@@ -82,7 +88,7 @@ public class ThreadPollingSampleProg {
 					Thread.sleep(10_000);
 
 					// synchronized (new Object()) {
-					wait = true;
+					wait = false;
 					// }
 
 					System.out.println("[Child]: Parent, I got up from sleep.");
@@ -190,5 +196,46 @@ public class ThreadPollingSampleProg {
 		}
 		System.out.println("5 has Reached!");
 	}
+	
+	public static void doWaitTestWithExecutors() {
 
+		System.out.println("Thread Polling Sample Test (With Executors): [Starts]");
+
+		ExecutorService service = null;
+		Future<Boolean> childMessage = null;
+		try {
+			service = Executors.newSingleThreadExecutor();
+			
+			childMessage = service.submit(() -> {
+				System.out.println("[Child]: Parent, I will sleep. Wait for me.");
+				return true;
+			});
+			
+			//Also, can wait for specific duration - childMessage.get(10, TimeUnit.SECONDS);
+			if (childMessage.get()) {
+				System.out.println("[Parent]: I will wait Child.");
+			}
+
+			childMessage = service.submit(() -> {
+
+				Thread.sleep(10_000);
+				System.out.println("[Child]: Parent, I got up from sleep.");
+				return true;
+			});
+
+			if (childMessage.get()) {
+				System.out.println("[Parent]: Finally, you got up!");
+			}
+
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Communication between Parent and Child cannot proceed due to the following issue.");
+			System.out.println(e);
+		} finally {
+			if (service != null)
+				service.shutdown();
+		}
+		
+		System.out.println("Thread Polling Sample Test (With Executors): [Ends]");
+	}
 }

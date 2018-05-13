@@ -1,7 +1,6 @@
 package defaultPackage;
 
 
-
 /**
  * 
  * @author Sawan.Patwari
@@ -13,7 +12,7 @@ public class TestQuickProg {
 		// TODO Auto-generated method stub
 		
 		//will be deleting the code after the code test.
-		
+	
 	}
 
 }
