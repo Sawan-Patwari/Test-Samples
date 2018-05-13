@@ -8,7 +8,7 @@ import java.util.Objects;
  *
  */
 public class ThreadsProg extends Thread implements Runnable {
-
+	
 	/**
 	 * I wanted to synchronize the custom thread creation activity between JVM call
 	 * and my explicit 'main' call as a lambda expression as part of the static
@@ -25,19 +25,14 @@ public class ThreadsProg extends Thread implements Runnable {
 		 */
 		doBasicTest(args);
 
-		//Look at the overridden run() method for other samples on Threads.
+		// Look at the overridden run() method for other samples on Threads.
 	}
 
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
 
-		main(null);// I am calling main.
-
-		// All remaining sample code testing will be done here because I want to execute
-		// the test code only once and this cannot be achieved if I code it in the
-		// 'main' method.
-
+		main(null);// I am calling main.		
 	}
 
 	static {
@@ -69,6 +64,17 @@ public class ThreadsProg extends Thread implements Runnable {
 
 		// running lambda API.
 		MyLambdaAPI.doSampleTest(x);
+
+		// ChildThread is not a Thread per se, but only implements Runnable Interface.
+		(new Thread(new ChildThread())).start();
+
+		// also, regular interface approach.
+		new ChildThread().run();
+
+		(new Thread(() -> {
+			new MyFirstThreadClass("MyFirstThreadClass").start();
+
+		})).start();
 	}
 
 }
@@ -190,4 +196,14 @@ class MyLambdaAPI {
 	static void doSampleTest(Runnable lfunction) {
 		lfunction.run();
 	}
+}
+
+class ChildThread implements Runnable {
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		System.out.println("I am a child thread.");
+	}
+
 }
