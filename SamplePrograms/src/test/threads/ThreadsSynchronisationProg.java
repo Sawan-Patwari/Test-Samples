@@ -3,6 +3,11 @@ package test.threads;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * 
+ * @author Sawan.Patwari
+ *
+ */
 public class ThreadsSynchronisationProg {
 
 	private static long ELEVEN_SECONDS = 11_000;
