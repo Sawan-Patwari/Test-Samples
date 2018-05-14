@@ -39,7 +39,8 @@ class SynchronisationTest {
 	private void doDisplay(boolean isSynchronisationRequired) {
 
 		if (isSynchronisationRequired) {
-			synchronized (this) {
+			//synchronized (this) {//one of the ways.
+			synchronized (SynchronisationTest.class) {//another way.
 				System.out.println(provideContent());
 			}
 		} else {
@@ -48,7 +49,7 @@ class SynchronisationTest {
 	}
 
 	@SuppressWarnings("static-access")
-	private int provideContent() {
+	private int provideContent() {//didn't synchronize the method, per my requirement.
 
 		try {
 			Thread.currentThread().sleep(ONE_SECOND);
