@@ -4,17 +4,26 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * 
+ * @author Sawan.Patwari
+ *
+ */
 public class ThreadPollingSampleProg {
 
 	private static boolean wait;
+	
+	private static AtomicBoolean atomicWait = new AtomicBoolean(false);
 
 	private static int counter = 0;
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		doBooleanWaitTestWithFix();
+		doBooleanWaitTestWithTweak();
+		doBooleanWaitTestWithGenuineFix();
 		doWaitTestWithExecutors();
 		doCounterWaitTestWithFix();
 	}
@@ -70,11 +79,60 @@ public class ThreadPollingSampleProg {
 			System.out.println(e);
 		}
 	}
+	
+	public static void doBooleanWaitTestWithGenuineFix() {
+		try {
+			System.out.println("Thread Polling Sample Test: [Starts]");
+			new Thread(() -> {
+
+				//synchronized (new Object()) {
+				atomicWait.set(true);
+				//}
+
+				try {
+					System.out.println("[Child]: Parent, I will sleep. Wait for me.");
+					Thread.sleep(10_000);
+
+					//synchronized (new Object()) {
+						//wait = false;
+					atomicWait.set(false);
+					//}
+
+					System.out.println("[Child]: Parent, I got up from sleep.");
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					System.out.println(e);
+				}
+			}).start();
+
+			try {
+				// The below sleep from Parent was needed to wait till the 'wait' shared
+				// variable was set to 'true' by the Child.
+				Thread.sleep(2_000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				System.out.println(e);
+			}
+
+			System.out.println("[Parent]: I will wait Child.");
+			synchronized (new Object()) {
+				while (atomicWait.get()) {
+					// System.out.println("[Parent]: Child, did you get up?");
+
+				}
+			}
+			System.out.println("[Parent]: Finally, you got up!");
+
+			System.out.println("Thread Polling Sample Test: [Ends]");
+		} catch (Error | Exception e) {
+			System.out.println(e);
+		}
+	}
 
 	/**
 	 * 
 	 */	
-	public static void doBooleanWaitTestWithFix() {
+	public static void doBooleanWaitTestWithTweak() {
 		try {
 			System.out.println("Thread Polling Sample Test: [Starts]");
 			new Thread(() -> {
@@ -112,7 +170,7 @@ public class ThreadPollingSampleProg {
 
 			while (wait) {
 				// System.out.println("[Parent]: Child, did you get up?");
-				try {
+				try {//unnecessary code.
 					Thread.sleep(1_000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
