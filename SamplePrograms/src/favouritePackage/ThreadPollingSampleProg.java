@@ -170,7 +170,7 @@ public class ThreadPollingSampleProg {
 
 			while (wait) {
 				// System.out.println("[Parent]: Child, did you get up?");
-				try {//unnecessary code.
+				try {//unnecessary code and this is the fix with a tweak.
 					Thread.sleep(1_000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
