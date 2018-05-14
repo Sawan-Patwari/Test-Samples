@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class ExecutorServiceProg {
 
@@ -90,6 +91,19 @@ public class ExecutorServiceProg {
 		}finally { 
 			if (service != null)
 				service.shutdown();
+		}
+		if (service != null) {
+			try {
+				service.awaitTermination(1, TimeUnit.MINUTES);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// Check whether all tasks are finished
+			if (service.isTerminated())
+				System.out.println("All tasks finished");
+			else
+				System.out.println("At least one task is still running");
 		}
 	}
 
