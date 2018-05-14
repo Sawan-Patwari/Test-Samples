@@ -37,11 +37,13 @@ public class ThreadPollingSampleProg {
 	 */
 	@Deprecated
 	public static void doBooleanWaitTest() {
+		
+		Object lock = new Object();
 		try {
 			System.out.println("Thread Polling Sample Test: [Starts]");
 			new Thread(() -> {
 
-				synchronized (new Object()) {
+				synchronized (lock) {
 					wait = true;
 				}
 
@@ -49,7 +51,7 @@ public class ThreadPollingSampleProg {
 					System.out.println("[Child]: Parent, I will sleep. Wait for me.");
 					Thread.sleep(10_000);
 
-					synchronized (new Object()) {
+					synchronized (lock) {
 						wait = false;
 					}
 
@@ -70,7 +72,7 @@ public class ThreadPollingSampleProg {
 			}
 
 			System.out.println("[Parent]: I will wait Child.");
-			synchronized (new Object()) {
+			synchronized (lock) {
 				while (wait) {
 					// System.out.println("[Parent]: Child, did you get up?");
 
@@ -89,18 +91,13 @@ public class ThreadPollingSampleProg {
 			System.out.println("Thread Polling Sample Test: [Starts]");
 			new Thread(() -> {
 
-				//synchronized (new Object()) {
 				atomicWait.set(true);
-				//}
 
 				try {
 					System.out.println("[Child]: Parent, I will sleep. Wait for me.");
 					Thread.sleep(10_000);
 
-					//synchronized (new Object()) {
-						//wait = false;
 					atomicWait.set(false);
-					//}
 
 					System.out.println("[Child]: Parent, I got up from sleep.");
 				} catch (InterruptedException e) {
@@ -119,12 +116,11 @@ public class ThreadPollingSampleProg {
 			}
 
 			System.out.println("[Parent]: I will wait Child.");
-			synchronized (new Object()) {
-				while (atomicWait.get()) {
-					// System.out.println("[Parent]: Child, did you get up?");
-
-				}
+			
+			while (atomicWait.get()) {
+					//do nothing
 			}
+			
 			System.out.println("[Parent]: Finally, you got up!");
 
 			System.out.println("Thread Polling Sample Test: [Ends]");
@@ -141,17 +137,13 @@ public class ThreadPollingSampleProg {
 			System.out.println("Thread Polling Sample Test: [Starts]");
 			new Thread(() -> {
 
-				// synchronized (new Object()) {
 				wait = true;
-				// }
 
 				try {
 					System.out.println("[Child]: Parent, I will sleep. Wait for me.");
 					Thread.sleep(10_000);
 
-					// synchronized (new Object()) {
 					wait = false;
-					// }
 
 					System.out.println("[Child]: Parent, I got up from sleep.");
 				} catch (InterruptedException e) {
@@ -170,11 +162,10 @@ public class ThreadPollingSampleProg {
 			}
 
 			System.out.println("[Parent]: I will wait Child.");
-			// synchronized (new Object()) {
 
 			while (wait) {
 				// System.out.println("[Parent]: Child, did you get up?");
-				try {//unnecessary code and this is the fix with a tweak.
+				try {// unnecessary code and this is the fix with a tweak.
 					Thread.sleep(1_000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -182,7 +173,7 @@ public class ThreadPollingSampleProg {
 				}
 
 			}
-			// }
+
 			System.out.println("[Parent]: Finally, you got up!");
 
 			System.out.println("Thread Polling Sample Test: [Ends]");
@@ -196,9 +187,10 @@ public class ThreadPollingSampleProg {
 	 */
 	@Deprecated
 	public static void doCounterWaitTest() {
+		Object lock = new Object();
 		new Thread(() -> {
 			for (int i = 0; i < 10; i++) {
-				synchronized (new Object()) {
+				synchronized (lock) {
 					counter++;
 				}
 
@@ -209,13 +201,13 @@ public class ThreadPollingSampleProg {
 					e.printStackTrace();
 				}
 
-				synchronized (new Object()) {
+				synchronized (lock) {
 					System.out.println(counter);
 				}
 			}
 		}).start();
 
-		synchronized (new Object()) {
+		synchronized (lock) {
 			while (counter <= 5) {
 
 			}
@@ -224,11 +216,11 @@ public class ThreadPollingSampleProg {
 	}
 
 	public static void doCounterWaitTestWithTweak() {
+
 		new Thread(() -> {
 			for (int i = 0; i < 10; i++) {
-				synchronized (new Object()) {
-					counter++;
-				}
+
+				counter++;
 
 				try {
 					Thread.sleep(5_000);
@@ -237,35 +229,29 @@ public class ThreadPollingSampleProg {
 					e.printStackTrace();
 				}
 
-				synchronized (new Object()) {
-					System.out.println(counter);
-				}
+				System.out.println(counter);
+
 			}
 		}).start();
 
-		synchronized (new Object()) {
+		while (counter <= 5) {
 
-			while (counter <= 5) {
-
-				try {//a tweak to fix the hanging issue.
-					Thread.sleep(1_000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			try {// a tweak to fix the hanging issue.
+				Thread.sleep(1_000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-
 		}
+
 		System.out.println("5 has Reached!");
 	}
 	
 	public static void doCounterWaitTestWithGenuineFix() {
 		new Thread(() -> {
 			for (int i = 0; i < 10; i++) {
-				//synchronized (new Object()) {
-					//counter++;
-					atomicCounter.getAndIncrement();
-				//}
+
+				atomicCounter.getAndIncrement();
 
 				try {
 					Thread.sleep(5_000);
@@ -274,24 +260,19 @@ public class ThreadPollingSampleProg {
 					e.printStackTrace();
 				}
 
-				//synchronized (new Object()) {
-					//System.out.println(counter);
-					System.out.println(atomicCounter.get());
-				//}
+				System.out.println(atomicCounter.get());
+
 			}
 		}).start();
 
-		synchronized (new Object()) {
+		// while (counter <= 5) {
+		while (atomicCounter.get() <= 5) {
 
-			//while (counter <= 5) {
-			while (atomicCounter.get() <= 5) {
-
-				//do nothing.
-			}
-
+			// do nothing.
 		}
+
 		System.out.println("5 has Reached! I (main) will exit now.");
-	}	
+	}
 	
 	public static void doWaitTestWithExecutors() {
 
