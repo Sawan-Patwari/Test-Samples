@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 
@@ -18,6 +19,8 @@ public class ThreadPollingSampleProg {
 	private static AtomicBoolean atomicWait = new AtomicBoolean(false);
 
 	private static int counter = 0;
+	
+	private static AtomicInteger atomicCounter = new AtomicInteger(0);
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -25,7 +28,8 @@ public class ThreadPollingSampleProg {
 		doBooleanWaitTestWithTweak();
 		doBooleanWaitTestWithGenuineFix();
 		doWaitTestWithExecutors();
-		doCounterWaitTestWithFix();
+		doCounterWaitTestWithTweak();
+		doCounterWaitTestWithGenuineFix();
 	}
 
 	/**
@@ -219,7 +223,7 @@ public class ThreadPollingSampleProg {
 		System.out.println("Reached!");
 	}
 
-	public static void doCounterWaitTestWithFix() {
+	public static void doCounterWaitTestWithTweak() {
 		new Thread(() -> {
 			for (int i = 0; i < 10; i++) {
 				synchronized (new Object()) {
@@ -243,7 +247,7 @@ public class ThreadPollingSampleProg {
 
 			while (counter <= 5) {
 
-				try {
+				try {//a tweak to fix the hanging issue.
 					Thread.sleep(1_000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -254,6 +258,40 @@ public class ThreadPollingSampleProg {
 		}
 		System.out.println("5 has Reached!");
 	}
+	
+	public static void doCounterWaitTestWithGenuineFix() {
+		new Thread(() -> {
+			for (int i = 0; i < 10; i++) {
+				//synchronized (new Object()) {
+					//counter++;
+					atomicCounter.getAndIncrement();
+				//}
+
+				try {
+					Thread.sleep(5_000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				//synchronized (new Object()) {
+					//System.out.println(counter);
+					System.out.println(atomicCounter.get());
+				//}
+			}
+		}).start();
+
+		synchronized (new Object()) {
+
+			//while (counter <= 5) {
+			while (atomicCounter.get() <= 5) {
+
+				//do nothing.
+			}
+
+		}
+		System.out.println("5 has Reached! I (main) will exit now.");
+	}	
 	
 	public static void doWaitTestWithExecutors() {
 
