@@ -29,7 +29,7 @@ public class ThreadsSynchronisationProg {
 }
 
 class SynchronisationTest {
-	private int counter = 0;
+	private int counter = 0;//without using Atomic int.
 
 	public static boolean WITH_SYNCHRONISATION = true;
 	public static boolean WITHOUT_SYNCHRONISATION = false;
