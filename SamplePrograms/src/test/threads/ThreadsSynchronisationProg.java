@@ -546,7 +546,7 @@ public class ThreadsSynchronisationProg {
  */
 
 /*
- * Note-2: Synchronized methods in Collections:
+ * Note-2: Synchronized methods in Collections: 
  * synchronizedCollection(Collection<T> c) 
  * synchronizedList(List<T> list)
  * synchronizedMap(Map<K,V> m) 
