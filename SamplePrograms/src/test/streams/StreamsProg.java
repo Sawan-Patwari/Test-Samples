@@ -1017,7 +1017,7 @@ public class StreamsProg {
  * 
  * Example:
  * 
- * double d = 2.0; DoubleToIntFunction func = x -> 2; func.applyAsInt(d);
+ * double d = 2.0; DoubleToIntFunction function = x -> 2; func.applyAsInt(d);
  */
 
 /*Note-3:
@@ -1065,21 +1065,22 @@ public class StreamsProg {
 
 /*
  * Note-4:
- * ■ ■ Supplier<T> : Method get() returns T 
- * ■ ■ Consumer<T> : Method accept(T t) returns void 
- * ■ ■ BiConsumer<T> : Method accept(T t, U u) returns void 
- * ■ ■ Predicate<T> : Method test(T t) returns boolean 
- * ■ ■ BiPredicate<T> : Method test(T t, U u) returns boolean
- * ■ ■ Function<T, R> : Method apply(T t) returns R 
- * ■ ■ BiFunction<T, U, R> : Method apply(T t, U u) returns R
- * ■ ■ UnaryOperator<T> : Method apply(T t) returns T
- * ■ ■ BinaryOperator<T> : Method apply(T t1, T t2) returns T
+ * Supplier<T> : Method get() returns T 
+ * Consumer<T> : Method accept(T t) returns void 
+ * BiConsumer<T> : Method accept(T t, U u) returns void 
+ * Predicate<T> : Method test(T t) returns boolean 
+ * BiPredicate<T> : Method test(T t, U u) returns boolean
+ * Function<T, R> : Method apply(T t) returns R 
+ * BiFunction<T, U, R> : Method apply(T t, U u) returns R
+ * UnaryOperator<T> : Method apply(T t) returns T
+ * BinaryOperator<T> : Method apply(T t1, T t2) returns T
  */
 
 /*
  * Note-5: Nested classes can be static (which means this class can have static methods). 
  * But, local classes (classes with methods of another class) 
- * cannot be static (which means this class cannot have static methods). 
+ * cannot be static (which means this class cannot have static methods). Classes other 
+ * than the file names cannot be static(obviously).
  */
 //**********************
 //Notes: [End]

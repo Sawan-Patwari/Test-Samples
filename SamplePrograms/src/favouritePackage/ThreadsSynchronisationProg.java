@@ -1,5 +1,6 @@
 package favouritePackage;
 
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
@@ -309,19 +310,52 @@ public class ThreadsSynchronisationProg {
 		
 		private static void doTest(BUG option) {
 			
+			final String successMessage = "All the data is deleted.";
+			final String failureMessage = "Data is not deleted due to:";
+			
 			try {
 				Map<String, Integer> data = null;
 				if (option == BUG.WITH) {
-					data = new HashMap<String, Integer>();
-					data.put("A", 1);
-					data.put("B", 2);
-					for (String key : data.keySet())
-						data.remove(key);
 					
-					if(data.isEmpty()) {
-						System.out.println("All the data deleted.");
+					System.out.println("Sub-Test-1: [Started]");
+					try {
+						
+						data = new HashMap<String, Integer>();
+						data.put("A", 1);
+						data.put("B", 2);
+						for (String key : data.keySet())
+							data.remove(key);
+						
+						if(data.isEmpty()) {
+							System.out.println(successMessage);
+						}
+					}catch(ConcurrentModificationException e) {
+						System.out.println(failureMessage+e);
 					}
+					System.out.println("Sub-Test-1: [Ended]");
+					
+					System.out.println("Sub-Test-2: [Started]");		
+					try {
+						data = new HashMap<String, Integer>();
+						data.put("A", 1);
+						data.put("B", 2);
+						
+						Map<String,Integer> synchronizedData = Collections.synchronizedMap(data);
+						
+						//Synchronized methods of Collections class doesn't work with iterators.
+						for (String key : synchronizedData.keySet())
+							synchronizedData.remove(key);
+						
+						if(synchronizedData.isEmpty()) {
+							System.out.println(successMessage);
+						}
+					}catch(ConcurrentModificationException e) {
+						System.out.println(failureMessage+e);
+					}
+					System.out.println("Sub-Test-2: [Ended]");	
+					
 				} else {
+					
 					data = new ConcurrentHashMap<String, Integer>();
 					data.put("A", 1);
 					data.put("B", 2);
@@ -329,11 +363,11 @@ public class ThreadsSynchronisationProg {
 						data.remove(key);
 					
 					if(data.isEmpty()) {
-						System.out.println("All the data deleted.");
+						System.out.println(successMessage);
 					}
 				}
-			} catch (ConcurrentModificationException e) {
-				System.out.println("Data is not deleted due to:"+e);
+			} catch (Exception e) {
+				System.out.println(failureMessage+e);
 			}
 
 		}
