@@ -178,8 +178,8 @@ public class ThreadsSynchronisationProg {
 
 					class WithConcurrentAPI extends API {
 
-						private AtomicInteger initialPutValue = new AtomicInteger(0);
-						private AtomicInteger initialGetValue = new AtomicInteger(0);
+						private AtomicInteger initialPutPointer = new AtomicInteger(0);
+						private AtomicInteger initialGetPointer = new AtomicInteger(0);
 
 						private Map<Integer, Integer> data = new ConcurrentHashMap<Integer, Integer>();
 
@@ -192,18 +192,18 @@ public class ThreadsSynchronisationProg {
 						}
 
 						public void createData() {
-							initialPutValue.incrementAndGet();
-							put(initialPutValue.get(), initialPutValue.get());
+							initialPutPointer.incrementAndGet();
+							put(initialPutPointer.get(), initialPutPointer.get());
 						}
 
 						public Integer getEachDataElement() {
-							initialGetValue.incrementAndGet();
-							return get(initialGetValue.get());
+							initialGetPointer.incrementAndGet();
+							return get(initialGetPointer.get());
 						}
 
 						public void reset() {
-							initialPutValue.set(0);
-							initialGetValue.set(0);
+							initialPutPointer.set(0);
+							initialGetPointer.set(0);
 							data.clear();
 						}
 
@@ -221,8 +221,8 @@ public class ThreadsSynchronisationProg {
 				} else {
 
 					class WithoutConcurrentAPI extends API {
-						private int initialPutValue = 0;
-						private int initialGetValue = 0;
+						private int initialPutPointer = 0;
+						private int initialGetPointer = 0;
 
 						private Map<Integer, Integer> data = new HashMap<Integer, Integer>();
 						
@@ -243,20 +243,20 @@ public class ThreadsSynchronisationProg {
 						}
 
 						public synchronized void createData() {
-							++initialPutValue;
-							put(initialPutValue, initialPutValue);
+							++initialPutPointer;
+							put(initialPutPointer, initialPutPointer);
 						}
 
 						public synchronized Integer getEachDataElement() {
-							++initialGetValue;
-							return get(initialGetValue);
+							++initialGetPointer;
+							return get(initialGetPointer);
 						}
 
 						//This method doesn't need synchronization as it will be called
 						//by a single thread.
 						public void reset() {
-							initialPutValue = 0;
-							initialGetValue = 0;
+							initialPutPointer = 0;
+							initialGetPointer = 0;
 							data.clear();
 						}
 
