@@ -1,5 +1,6 @@
 package favouritePackage;
 
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +19,7 @@ public class ThreadsSynchronisationProg {
 		// TODO Auto-generated method stub
 		executeTest1();
 		executeTest2();
+		executeTest3();
 	}
 
 	/**
@@ -38,6 +40,18 @@ public class ThreadsSynchronisationProg {
 	public static void executeTest2() {
 		try {
 			Synchronisation.executeTest2();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e);
+		}
+	}
+	
+	/**
+	 * I should be able to test this method easily from TestQuickProg.java as well.
+	 */
+	public static void executeTest3() {
+		try {
+			Synchronisation.executeTest3();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			System.out.println(e);
@@ -75,7 +89,19 @@ public class ThreadsSynchronisationProg {
 			}
 
 		}
+		
+		enum BUG {
+			WITH(true), WITHOUT(false);
 
+			@SuppressWarnings("unused")
+			private boolean option;
+
+			BUG(boolean option) {
+				this.option = option;
+			}
+
+		}
+		
 		// private void doDisplay(boolean isSynchronisationRequired) {
 		private void doDisplay(SYNCHRONISATION option) {
 
@@ -280,6 +306,37 @@ public class ThreadsSynchronisationProg {
 			}
 
 		}
+		
+		private static void doTest(BUG option) {
+			
+			try {
+				Map<String, Integer> data = null;
+				if (option == BUG.WITH) {
+					data = new HashMap<String, Integer>();
+					data.put("A", 1);
+					data.put("B", 2);
+					for (String key : data.keySet())
+						data.remove(key);
+					
+					if(data.isEmpty()) {
+						System.out.println("All the data deleted.");
+					}
+				} else {
+					data = new ConcurrentHashMap<String, Integer>();
+					data.put("A", 1);
+					data.put("B", 2);
+					for (String key : data.keySet())
+						data.remove(key);
+					
+					if(data.isEmpty()) {
+						System.out.println("All the data deleted.");
+					}
+				}
+			} catch (ConcurrentModificationException e) {
+				System.out.println("Data is not deleted due to:"+e);
+			}
+
+		}
 
 		public static void executeTest1() throws InterruptedException {
 
@@ -297,7 +354,7 @@ public class ThreadsSynchronisationProg {
 
 			System.out.println("executeTest1(): [Ended]");
 		}
-
+		
 		public static void executeTest2() throws InterruptedException {
 
 			System.out.println("executeTest2(): [Started]");
@@ -315,5 +372,21 @@ public class ThreadsSynchronisationProg {
 			System.out.println("executeTest2(): [Ended]");
 		}
 
+		public static void executeTest3() throws InterruptedException {
+
+			System.out.println("executeTest3(): [Started]");
+
+			System.out.println("Synchronisation.doTest(BUG.WITH): [Started]");
+			Synchronisation.doTest(BUG.WITH);
+			Thread.sleep(THREE_SECONDS);
+			System.out.println("Synchronisation.doTest(BUG.WITH): [Ended]");
+			Thread.sleep(THREE_SECONDS);
+			System.out.println("Synchronisation.doTest(BUG.WITHOUT): [Started]");
+			Synchronisation.doTest(BUG.WITHOUT);
+			Thread.sleep(THREE_SECONDS);
+			System.out.println("Synchronisation.doTest(BUG.WITHOUT): [Ended]");
+
+			System.out.println("executeTest3(): [Ended]");
+		}
 	}
 }
