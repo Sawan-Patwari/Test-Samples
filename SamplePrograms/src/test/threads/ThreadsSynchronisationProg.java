@@ -144,7 +144,18 @@ public class ThreadsSynchronisationProg {
 
 					System.out.println("Displaying data by using Multiple Threads:");
 					for (int i = 0; i < 10; i++)
-						service.submit(() -> System.out.println(this.getEachDataElement()));
+						service.submit(() -> 
+									{
+										/**
+										 * Need a synchronized block since 'System.out' is also a resource
+										 * being accessed by multiple threads at the same time. It will not
+										 * be sufficient if the method 'getEachDataElement' is synchronized.
+										 */
+										synchronized(API.class) {
+											System.out.println(this.getEachDataElement());
+										}
+									}
+								);
 
 					try {
 						Thread.sleep(THREE_SECONDS);
@@ -214,12 +225,20 @@ public class ThreadsSynchronisationProg {
 						private int initialGetValue = 0;
 
 						private Map<Integer, Integer> data = new HashMap<Integer, Integer>();
-
-						private synchronized void put(Integer key, Integer value) {
+						
+						//'synchronized' keyword not needed as it is a private access. The method 
+						//which accesses this method should be synchronized if it is a public method
+						// and will be accessed by multiple threads else don't use the 
+						//'synchronized' keyword to even that method as well.
+						private void put(Integer key, Integer value) {
 							data.put(key, value);
 						}
-
-						private synchronized Integer get(Integer key) {
+						
+						//'synchronized' keyword not needed as it is a private access. The method 
+						//which accesses this method should be synchronized if it is a public method
+						// and will be accessed by multiple threads else don't use the 
+						//'synchronized' keyword to even that method as well.
+						private Integer get(Integer key) {
 							return data.get(key);
 						}
 
@@ -233,12 +252,16 @@ public class ThreadsSynchronisationProg {
 							return get(initialGetValue);
 						}
 
+						//This method doesn't need synchronization as it will be called
+						//by a single thread.
 						public void reset() {
 							initialPutValue = 0;
 							initialGetValue = 0;
 							data.clear();
 						}
 
+						//This method doesn't need synchronization as it will be called
+						//by a single thread.
 						@Override
 						Map<Integer, Integer> getWholeData() {
 							// TODO Auto-generated method stub
