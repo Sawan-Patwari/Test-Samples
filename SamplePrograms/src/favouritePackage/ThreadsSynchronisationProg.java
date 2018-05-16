@@ -410,17 +410,21 @@ public class ThreadsSynchronisationProg {
 				
 				System.out.println("ConcurrentLinkedQueue Sample: [Started]");
 				Queue<Integer> queue = new ConcurrentLinkedQueue<>();
+				//true if inserts (at front -head) else false but no exception thrown if it cannot 
+				//insert due to capacity constraints unlike in add.
 				queue.offer(12);
-				System.out.println(queue.peek());
-				System.out.println(queue.poll());
+				System.out.println(queue.peek());//only selects the head
+				System.out.println(queue.poll());//selects and removes the head
 				System.out.println("ConcurrentLinkedQueue Sample: [Ended]");
 				
 				System.out.println("ConcurrentLinkedDeque Sample: [Started]");
-				Deque<Integer> deque = new ConcurrentLinkedDeque<>();
-				deque.offer(6);
-				deque.push(23);
-				System.out.println(deque.peek());
-				System.out.println(deque.pop());
+				Deque<Integer> deque = new ConcurrentLinkedDeque<>();// generally, meant for stack operations.
+				//true if inserts (at the tail end - last) else false but no exception thrown if it cannot 
+				//insert due to capacity constraints unlike in add.
+				deque.offer(6);// Also, same as offerLast().
+				deque.push(23);//Also, same as addFirst(). Exception thrown if no space.
+				System.out.println(deque.peek());//Same as peekFirst() - only selects first element.
+				System.out.println(deque.pop());//Removes first element. Same as removeFirst().
 				System.out.println("ConcurrentLinkedDeque Sample: [Ended]");
 				
 				System.out.println("LinkedBlockingQueue Sample: [Started]");
