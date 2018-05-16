@@ -1,12 +1,24 @@
 package test.threads;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -21,6 +33,7 @@ public class ThreadsSynchronisationProg {
 		executeTest1();
 		executeTest2();
 		executeTest3();
+		executeTest4();
 	}
 
 	/**
@@ -53,6 +66,18 @@ public class ThreadsSynchronisationProg {
 	public static void executeTest3() {
 		try {
 			Synchronisation.executeTest3();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e);
+		}
+	}
+	
+	/**
+	 * I should be able to test this method easily from TestQuickProg.java as well.
+	 */
+	public static void executeTest4() {
+		try {
+			Synchronisation.executeTest4();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			System.out.println(e);
@@ -371,6 +396,79 @@ public class ThreadsSynchronisationProg {
 			}
 
 		}
+		
+		private static void doTest() {
+
+			System.out.println("General Synchronisation/Concurrency based API samples: [Started]");
+			try {
+				System.out.println("ConcurrentHashMap Sample: [Started]");
+				Map<String,Integer> map = new ConcurrentHashMap<>();
+				map.put("A", 1);
+				map.put("B", 2);
+				System.out.println(map.get("B"));
+				System.out.println("ConcurrentHashMap Sample: [Ended]");
+				
+				System.out.println("ConcurrentLinkedQueue Sample: [Started]");
+				Queue<Integer> queue = new ConcurrentLinkedQueue<>();
+				queue.offer(12);
+				System.out.println(queue.peek());
+				System.out.println(queue.poll());
+				System.out.println("ConcurrentLinkedQueue Sample: [Ended]");
+				
+				System.out.println("ConcurrentLinkedDeque Sample: [Started]");
+				Deque<Integer> deque = new ConcurrentLinkedDeque<>();
+				deque.offer(6);
+				deque.push(23);
+				System.out.println(deque.peek());
+				System.out.println(deque.pop());
+				System.out.println("ConcurrentLinkedDeque Sample: [Ended]");
+				
+				System.out.println("LinkedBlockingQueue Sample: [Started]");
+				try {
+					
+					BlockingQueue<Integer> blockingQueue = new LinkedBlockingQueue<>();
+					blockingQueue.offer(76);
+					blockingQueue.offer(90, 4, TimeUnit.SECONDS);
+					System.out.println(blockingQueue.poll());
+					System.out.println(blockingQueue.poll(5, TimeUnit.SECONDS));
+					
+				} catch (InterruptedException e) {
+					System.out.println(e);
+				}
+				System.out.println("LinkedBlockingQueue Sample: [Ended]");
+				
+				System.out.println("LinkedBlockingDeque Sample: [Started]");
+				try {
+					BlockingDeque<Integer> blockingDeque = new LinkedBlockingDeque<>();
+					blockingDeque.offer(34);
+					blockingDeque.offerFirst(1, 1, TimeUnit.MINUTES);
+					blockingDeque.offerLast(35, 5, TimeUnit.SECONDS);
+					blockingDeque.offer(36, 4, TimeUnit.SECONDS);
+					System.out.println(blockingDeque.poll());
+					System.out.println(blockingDeque.poll(1_000, TimeUnit.MILLISECONDS));
+					System.out.println(blockingDeque.pollFirst(800, TimeUnit.NANOSECONDS));
+					System.out.println(blockingDeque.pollLast(1, TimeUnit.SECONDS));
+				} catch (InterruptedException e) {
+					System.out.println(e);
+				}
+				System.out.println("LinkedBlockingDeque Sample: [Ended]");
+				
+				System.out.println("CopyOnWriteArrayList Sample: [Started]");
+				List<Integer> list = new CopyOnWriteArrayList<>(Arrays.asList(1, 2, 3));
+				int i = 4;
+				for (Integer item : list) {
+					System.out.println(item);
+					list.add(i++);
+				}
+				System.out.println("Size: " + list.size());
+				System.out.println("CopyOnWriteArrayList Sample: [Ended]");
+				
+
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+			System.out.println("General Synchronisation/Concurrency based API samples: [Ended]");
+		}
 
 		public static void executeTest1() throws InterruptedException {
 
@@ -422,5 +520,39 @@ public class ThreadsSynchronisationProg {
 
 			System.out.println("executeTest3(): [Ended]");
 		}
+		
+		public static void executeTest4() throws InterruptedException {
+			
+			System.out.println("executeTest4(): [Started]");
+			
+			Synchronisation.doTest();
+			
+			System.out.println("executeTest4(): [Ended]");
+		}
 	}
 }
+
+/*
+ * Note-1: Concurrent collection classes list:
+ * ConcurrentHashMap - implements - ConcurrentMap - no ordering and no sorting.
+ * ConcurrentLinkedDeque - implements - Deque - Ordering but no sorting.
+ * ConcurrentLinkedQueue - implements - Queue - Ordering but no sorting.
+ * ConcurrentSkipListMap - implements - ConcurrentMap, SortedMap, NavigableMap - Ordering and sorting.
+ * ConcurrentSkipListSet - implements - SortedSet, NavigableSet - Ordering and sorting.
+ * CopyOnWriteArrayList - implements - List - Ordering but no sorting.
+ * CopyOnWriteArraySet - implements - Set - no ordering and no sorting.
+ * LinkedBlockingDeque - implements - BlockingQueue, BlockingDeque - Ordering and blocking but no sorting.
+ * LinkedBlockingQueue - implements - BlockingQueue - Ordering and blocking but no sorting.
+ */
+
+/*
+ * Note-2: Synchronized methods in Collections:
+ * synchronizedCollection(Collection<T> c) 
+ * synchronizedList(List<T> list)
+ * synchronizedMap(Map<K,V> m) 
+ * synchronizedNavigableMap(NavigableMap<K,V> m)
+ * synchronizedNavigableSet(NavigableSet<T> s) 
+ * synchronizedSet(Set<T> s)
+ * synchronizedSortedMap(SortedMap<K,V> m) 
+ * synchronizedSortedSet(SortedSet<T> s)
+ */
