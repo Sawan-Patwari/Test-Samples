@@ -431,8 +431,8 @@ public class ThreadsSynchronisationProg {
 				try {
 					
 					BlockingQueue<Integer> blockingQueue = new LinkedBlockingQueue<>();
-					blockingQueue.offer(76);
-					blockingQueue.offer(90, 4, TimeUnit.SECONDS);
+					blockingQueue.offer(76);//inserts at the head-end.
+					blockingQueue.offer(90, 4, TimeUnit.SECONDS);//blocking call.
 					System.out.println(blockingQueue.poll());
 					System.out.println(blockingQueue.poll(5, TimeUnit.SECONDS));
 					
@@ -444,11 +444,11 @@ public class ThreadsSynchronisationProg {
 				System.out.println("LinkedBlockingDeque Sample: [Started]");
 				try {
 					BlockingDeque<Integer> blockingDeque = new LinkedBlockingDeque<>();
-					blockingDeque.offer(34);
+					blockingDeque.offer(34);//inserts at the tail-end.
 					blockingDeque.offerFirst(1, 1, TimeUnit.MINUTES);
 					blockingDeque.offerLast(35, 5, TimeUnit.SECONDS);
-					blockingDeque.offer(36, 4, TimeUnit.SECONDS);
-					System.out.println(blockingDeque.poll());
+					blockingDeque.offer(36, 4, TimeUnit.SECONDS);//blocking call.
+					System.out.println(blockingDeque.poll());//removes the head (front end) without blocking.
 					System.out.println(blockingDeque.poll(1_000, TimeUnit.MILLISECONDS));
 					System.out.println(blockingDeque.pollFirst(800, TimeUnit.NANOSECONDS));
 					System.out.println(blockingDeque.pollLast(1, TimeUnit.SECONDS));
@@ -457,17 +457,37 @@ public class ThreadsSynchronisationProg {
 				}
 				System.out.println("LinkedBlockingDeque Sample: [Ended]");
 				
-				System.out.println("CopyOnWriteArrayList Sample: [Started]");
+				System.out.println("CopyOnWriteArrayList Sample: [Started]");				
+				//Copies all of their elements to a new underlying structure any time an element is
+				//added, modified, or removed from the collection. In case of modified scenario, 
+				//if the reference in the collection is changed (add(index, element)) but not if the content
+				//of the reference is changed as in the case of set(index, element) operation.
 				List<Integer> list = new CopyOnWriteArrayList<>(Arrays.asList(1, 2, 3));
 				int i = 4;
 				for (Integer item : list) {
 					System.out.println(item);
-					list.add(i++);
+					list.add(i++);//throws an exception if ArrayList is used instead of CopyOnWriteArrayList.
 				}
+				System.out.println(list);
 				System.out.println("Size: " + list.size());
+				
+				for (Integer item : list) {
+					System.out.println(item);
+					list.add(2, 0);//This causes copy on write because the reference in the collection is changed.
+				}
+				System.out.println(list);
+				System.out.println("Size: " + list.size());
+				
+				for (Integer item : list) {
+					System.out.println(item);
+					list.set(2, 100);//This operation will not cause copy on write because 
+					//the content referenced in the collection is changed and not the reference itself.
+				}
+				System.out.println(list);
+				System.out.println("Size: " + list.size());
+				
 				System.out.println("CopyOnWriteArrayList Sample: [Ended]");
 				
-
 			} catch (Exception e) {
 				System.out.println(e);
 			}
