@@ -1,5 +1,6 @@
 package test.threads;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
@@ -380,7 +381,7 @@ public class ThreadsSynchronisationProg {
 					System.out.println("Sub-Test-2: [Ended]");	
 					
 				} else {
-					
+					System.out.println("{ConcurrentHashMap Sub-Test-1}:[Started]");
 					data = new ConcurrentHashMap<String, Integer>();
 					data.put("A", 1);
 					data.put("B", 2);
@@ -390,6 +391,18 @@ public class ThreadsSynchronisationProg {
 					if(data.isEmpty()) {
 						System.out.println(successMessage);
 					}
+					System.out.println("{ConcurrentHashMap Sub-Test-1}:[Ended]");
+					
+					System.out.println("{Collections.synchronizedList Sub-Test-2}:[Started]");
+					List<Integer> list = Collections.synchronizedList(new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5)));
+					synchronized (list) {
+					//synchronizedList will not synchronize iterator based code. Need explicit synchronized block
+					//if the code is accessed by multiple threads.
+						for (int element : list)
+							System.out.print(element + " ");
+					}
+					System.out.println();
+					System.out.println("{Collections.synchronizedList Sub-Test-2}:[Ended]");
 				}
 			} catch (Exception e) {
 				System.out.println(failureMessage+e);
