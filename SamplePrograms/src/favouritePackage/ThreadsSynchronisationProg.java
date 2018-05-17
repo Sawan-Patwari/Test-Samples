@@ -60,7 +60,7 @@ public class ThreadsSynchronisationProg {
 			System.out.println(e);
 		}
 	}
-	
+
 	/**
 	 * I should be able to test this method easily from TestQuickProg.java as well.
 	 */
@@ -72,7 +72,7 @@ public class ThreadsSynchronisationProg {
 			System.out.println(e);
 		}
 	}
-	
+
 	/**
 	 * I should be able to test this method easily from TestQuickProg.java as well.
 	 */
@@ -116,7 +116,7 @@ public class ThreadsSynchronisationProg {
 			}
 
 		}
-		
+
 		enum BUG {
 			WITH(true), WITHOUT(false);
 
@@ -128,7 +128,7 @@ public class ThreadsSynchronisationProg {
 			}
 
 		}
-		
+
 		// private void doDisplay(boolean isSynchronisationRequired) {
 		private void doDisplay(SYNCHRONISATION option) {
 
@@ -155,18 +155,78 @@ public class ThreadsSynchronisationProg {
 			return ++counter;
 		}
 
-		private static void doTest(SYNCHRONISATION option) {
+		private static void doTest(SYNCHRONISATION option) throws InterruptedException {
 			ExecutorService service = null;
 			try {
 				service = Executors.newFixedThreadPool(20);
+
+				System.out.println("Sub-Test-1: [Started]");
 				Synchronisation syncTester = new Synchronisation();
 
 				for (int i = 0; i < 10; i++)
 					service.submit(() -> syncTester.doDisplay(option));
 
+				if (option == SYNCHRONISATION.WITHOUT) {
+					Thread.sleep(THREE_SECONDS);
+				} else {
+					Thread.sleep(ELEVEN_SECONDS);
+				}
+
+				System.out.println("Sub-Test-1: [Ended]");
+				Thread.sleep(3 * THREE_SECONDS);
+				System.out.println("Sub-Test-2: [Started]");
+				Thread.sleep(THREE_SECONDS);
+
+				class CollectionsSynchronizedMethodsTest {
+					private List<Integer> list = Collections
+							.synchronizedList(new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
+
+					public void doUnsynchronizedIteratorTest() {
+						System.out.println();
+						for (int element : list)
+							System.out.print(element + " ");
+						System.out.println();
+					}
+
+					public void doSynchronizedIteratorTest() {
+
+						synchronized (list) {
+							System.out.println();
+							for (int element : list)
+								System.out.print(element + " ");
+							System.out.println();
+						}
+					}
+
+				}
+
+				CollectionsSynchronizedMethodsTest tester = new CollectionsSynchronizedMethodsTest();
+
+				if (option == SYNCHRONISATION.WITHOUT) {
+					System.out.println("tester.doUnsynchronizedIteratorTest(): [Started]");
+					Thread.sleep(2 * THREE_SECONDS);
+					for (int i = 0; i < 50; i++)
+						service.submit(() -> tester.doUnsynchronizedIteratorTest());
+					Thread.sleep(THREE_SECONDS);
+					System.out.println();
+					System.out.println("tester.doUnsynchronizedIteratorTest(): [Ended]");
+				} else {
+					System.out.println("tester.doSynchronizedIteratorTest(): [Started]");
+					Thread.sleep(2 * THREE_SECONDS);
+					for (int i = 0; i < 50; i++)
+						service.submit(() -> tester.doSynchronizedIteratorTest());
+					Thread.sleep(THREE_SECONDS);
+					System.out.println();
+					System.out.println("tester.doSynchronizedIteratorTest(): [Ended]");
+				}
+				System.out.println("Sub-Test-2: [Ended]");
+
 			} finally {
 				if (service != null)
 					service.shutdown();
+				// Below call is not needed, quite frankly, because the wait times for the main
+				// thread are already in place inside this method.
+				// service.awaitTermination(ONE_MINUTE, TimeUnit.MINUTES);
 			}
 		}
 
@@ -197,18 +257,16 @@ public class ThreadsSynchronisationProg {
 
 					System.out.println("Displaying data by using Multiple Threads:");
 					for (int i = 0; i < 10; i++)
-						service.submit(() -> 
-									{
-										/**
-										 * Need a synchronized block since 'System.out' is also a resource
-										 * being accessed by multiple threads at the same time. It will not
-										 * be sufficient if the method 'getEachDataElement' is synchronized.
-										 */
-										synchronized(API.class) {
-											System.out.println(this.getEachDataElement());
-										}
-									}
-								);
+						service.submit(() -> {
+							/**
+							 * Need a synchronized block since 'System.out' is also a resource being
+							 * accessed by multiple threads at the same time. It will not be sufficient if
+							 * the method 'getEachDataElement' is synchronized.
+							 */
+							synchronized (API.class) {
+								System.out.println(this.getEachDataElement());
+							}
+						});
 
 					try {
 						Thread.sleep(THREE_SECONDS);
@@ -278,19 +336,19 @@ public class ThreadsSynchronisationProg {
 						private int initialGetPointer = 0;
 
 						private Map<Integer, Integer> data = new HashMap<Integer, Integer>();
-						
-						//'synchronized' keyword not needed as it is a private access. The method 
-						//which accesses this method should be synchronized if it is a public method
-						// and will be accessed by multiple threads else don't use the 
-						//'synchronized' keyword to even that method as well.
+
+						// 'synchronized' keyword not needed as it is a private access. The method
+						// which accesses this method should be synchronized if it is a public method
+						// and will be accessed by multiple threads else don't use the
+						// 'synchronized' keyword to even that method as well.
 						private void put(Integer key, Integer value) {
 							data.put(key, value);
 						}
-						
-						//'synchronized' keyword not needed as it is a private access. The method 
-						//which accesses this method should be synchronized if it is a public method
-						// and will be accessed by multiple threads else don't use the 
-						//'synchronized' keyword to even that method as well.
+
+						// 'synchronized' keyword not needed as it is a private access. The method
+						// which accesses this method should be synchronized if it is a public method
+						// and will be accessed by multiple threads else don't use the
+						// 'synchronized' keyword to even that method as well.
 						private Integer get(Integer key) {
 							return data.get(key);
 						}
@@ -305,16 +363,16 @@ public class ThreadsSynchronisationProg {
 							return get(initialGetPointer);
 						}
 
-						//This method doesn't need synchronization as it will be called
-						//by a single thread.
+						// This method doesn't need synchronization as it will be called
+						// by a single thread.
 						public void reset() {
 							initialPutPointer = 0;
 							initialGetPointer = 0;
 							data.clear();
 						}
 
-						//This method doesn't need synchronization as it will be called
-						//by a single thread.
+						// This method doesn't need synchronization as it will be called
+						// by a single thread.
 						@Override
 						Map<Integer, Integer> getWholeData() {
 							// TODO Auto-generated method stub
@@ -333,53 +391,53 @@ public class ThreadsSynchronisationProg {
 			}
 
 		}
-		
+
 		private static void doTest(BUG option) {
-			
+
 			final String successMessage = "All the data is deleted.";
 			final String failureMessage = "Data is not deleted due to:";
-			
+
 			try {
 				Map<String, Integer> data = null;
 				if (option == BUG.WITH) {
-					
+
 					System.out.println("Sub-Test-1: [Started]");
 					try {
-						
+
 						data = new HashMap<String, Integer>();
 						data.put("A", 1);
 						data.put("B", 2);
 						for (String key : data.keySet())
 							data.remove(key);
-						
-						if(data.isEmpty()) {
+
+						if (data.isEmpty()) {
 							System.out.println(successMessage);
 						}
-					}catch(ConcurrentModificationException e) {
-						System.out.println(failureMessage+e);
+					} catch (ConcurrentModificationException e) {
+						System.out.println(failureMessage + e);
 					}
 					System.out.println("Sub-Test-1: [Ended]");
-					
-					System.out.println("Sub-Test-2: [Started]");		
+
+					System.out.println("Sub-Test-2: [Started]");
 					try {
 						data = new HashMap<String, Integer>();
 						data.put("A", 1);
 						data.put("B", 2);
-						
-						Map<String,Integer> synchronizedData = Collections.synchronizedMap(data);
-						
-						//Synchronized methods of Collections class doesn't work with iterators.
+
+						Map<String, Integer> synchronizedData = Collections.synchronizedMap(data);
+
+						// Synchronized methods of Collections class doesn't work with iterators.
 						for (String key : synchronizedData.keySet())
 							synchronizedData.remove(key);
-						
-						if(synchronizedData.isEmpty()) {
+
+						if (synchronizedData.isEmpty()) {
 							System.out.println(successMessage);
 						}
-					}catch(ConcurrentModificationException e) {
-						System.out.println(failureMessage+e);
+					} catch (ConcurrentModificationException e) {
+						System.out.println(failureMessage + e);
 					}
-					System.out.println("Sub-Test-2: [Ended]");	
-					
+					System.out.println("Sub-Test-2: [Ended]");
+
 				} else {
 					System.out.println("{ConcurrentHashMap Sub-Test-1}:[Started]");
 					data = new ConcurrentHashMap<String, Integer>();
@@ -387,81 +445,73 @@ public class ThreadsSynchronisationProg {
 					data.put("B", 2);
 					for (String key : data.keySet())
 						data.remove(key);
-					
-					if(data.isEmpty()) {
+
+					if (data.isEmpty()) {
 						System.out.println(successMessage);
 					}
 					System.out.println("{ConcurrentHashMap Sub-Test-1}:[Ended]");
-					
-					System.out.println("{Collections.synchronizedList Sub-Test-2}:[Started]");
-					List<Integer> list = Collections.synchronizedList(new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5)));
-					synchronized (list) {
-					//Synchronized methods of Collections class will not synchronize iterator based code, but only get and set based operations. 
-					//Need explicit synchronized block if the code is accessed by multiple threads.
-						for (int element : list)
-							System.out.print(element + " ");
-					}
-					System.out.println();
-					System.out.println("{Collections.synchronizedList Sub-Test-2}:[Ended]");
+
 				}
 			} catch (Exception e) {
-				System.out.println(failureMessage+e);
+				System.out.println(failureMessage + e);
 			}
 
 		}
-		
+
 		private static void doTest() {
 
 			System.out.println("General Synchronisation/Concurrency based API samples: [Started]");
 			try {
 				System.out.println("ConcurrentHashMap Sample: [Started]");
-				Map<String,Integer> map = new ConcurrentHashMap<>();
+				Map<String, Integer> map = new ConcurrentHashMap<>();
 				map.put("A", 1);
 				map.put("B", 2);
 				System.out.println(map.get("B"));
 				System.out.println("ConcurrentHashMap Sample: [Ended]");
-				
+
 				System.out.println("ConcurrentLinkedQueue Sample: [Started]");
 				Queue<Integer> queue = new ConcurrentLinkedQueue<>();
-				//true if inserts (at front -head) else false but no exception thrown if it cannot 
-				//insert due to capacity constraints unlike in add.
+				// true if inserts (at front -head) else false but no exception thrown if it
+				// cannot
+				// insert due to capacity constraints unlike in add.
 				queue.offer(12);
-				System.out.println(queue.peek());//only selects the head
-				System.out.println(queue.poll());//selects and removes the head
+				System.out.println(queue.peek());// only selects the head
+				System.out.println(queue.poll());// selects and removes the head
 				System.out.println("ConcurrentLinkedQueue Sample: [Ended]");
-				
+
 				System.out.println("ConcurrentLinkedDeque Sample: [Started]");
 				Deque<Integer> deque = new ConcurrentLinkedDeque<>();// generally, meant for stack operations.
-				//true if inserts (at the tail end - last) else false but no exception thrown if it cannot 
-				//insert due to capacity constraints unlike in add.
+				// true if inserts (at the tail end - last) else false but no exception thrown
+				// if it cannot
+				// insert due to capacity constraints unlike in add.
 				deque.offer(6);// Also, same as offerLast().
-				deque.push(23);//Also, same as addFirst(). Exception thrown if no space.
-				System.out.println(deque.peek());//Same as peekFirst() - only selects first element.
-				System.out.println(deque.pop());//Removes first element. Same as removeFirst().
+				deque.push(23);// Also, same as addFirst(). Exception thrown if no space.
+				System.out.println(deque.peek());// Same as peekFirst() - only selects first element.
+				System.out.println(deque.pop());// Removes first element. Same as removeFirst().
 				System.out.println("ConcurrentLinkedDeque Sample: [Ended]");
-				
+
 				System.out.println("LinkedBlockingQueue Sample: [Started]");
 				try {
-					
+
 					BlockingQueue<Integer> blockingQueue = new LinkedBlockingQueue<>();
-					blockingQueue.offer(76);//inserts at the head-end.
-					blockingQueue.offer(90, 4, TimeUnit.SECONDS);//blocking call.
+					blockingQueue.offer(76);// inserts at the head-end.
+					blockingQueue.offer(90, 4, TimeUnit.SECONDS);// blocking call.
 					System.out.println(blockingQueue.poll());
 					System.out.println(blockingQueue.poll(5, TimeUnit.SECONDS));
-					
+
 				} catch (InterruptedException e) {
 					System.out.println(e);
 				}
 				System.out.println("LinkedBlockingQueue Sample: [Ended]");
-				
+
 				System.out.println("LinkedBlockingDeque Sample: [Started]");
 				try {
 					BlockingDeque<Integer> blockingDeque = new LinkedBlockingDeque<>();
-					blockingDeque.offer(34);//inserts at the tail-end.
+					blockingDeque.offer(34);// inserts at the tail-end.
 					blockingDeque.offerFirst(1, 1, TimeUnit.MINUTES);
 					blockingDeque.offerLast(35, 5, TimeUnit.SECONDS);
-					blockingDeque.offer(36, 4, TimeUnit.SECONDS);//blocking call.
-					System.out.println(blockingDeque.poll());//removes the head (front end) without blocking.
+					blockingDeque.offer(36, 4, TimeUnit.SECONDS);// blocking call.
+					System.out.println(blockingDeque.poll());// removes the head (front end) without blocking.
 					System.out.println(blockingDeque.poll(1_000, TimeUnit.MILLISECONDS));
 					System.out.println(blockingDeque.pollFirst(800, TimeUnit.NANOSECONDS));
 					System.out.println(blockingDeque.pollLast(1, TimeUnit.SECONDS));
@@ -469,38 +519,42 @@ public class ThreadsSynchronisationProg {
 					System.out.println(e);
 				}
 				System.out.println("LinkedBlockingDeque Sample: [Ended]");
-				
-				System.out.println("CopyOnWriteArrayList Sample: [Started]");				
-				//Copies all of the elements to a new underlying structure any time an element is
-				//added, modified, or removed from the collection. In case of modified scenario, copy will happen
-				//if the reference in the collection is changed (add(index, element)) but not if the content
-				//of the reference is changed as in the case of set(index, element) operation.
+
+				System.out.println("CopyOnWriteArrayList Sample: [Started]");
+				// Copies all of the elements to a new underlying structure any time an element
+				// is
+				// added, modified, or removed from the collection. In case of modified
+				// scenario, copy will happen
+				// if the reference in the collection is changed (add(index, element)) but not
+				// if the content
+				// of the reference is changed as in the case of set(index, element) operation.
 				List<Integer> list = new CopyOnWriteArrayList<>(Arrays.asList(1, 2, 3));
 				int i = 4;
 				for (Integer item : list) {
 					System.out.println(item);
-					list.add(i++);//throws an exception if ArrayList is used instead of CopyOnWriteArrayList.
+					list.add(i++);// throws an exception if ArrayList is used instead of CopyOnWriteArrayList.
 				}
 				System.out.println(list);
 				System.out.println("Size: " + list.size());
-				
+
 				for (Integer item : list) {
 					System.out.println(item);
-					list.add(2, 0);//This causes copy on write because the reference in the collection is changed.
+					list.add(2, 0);// This causes copy on write because the reference in the collection is changed.
 				}
 				System.out.println(list);
 				System.out.println("Size: " + list.size());
-				
+
 				for (Integer item : list) {
 					System.out.println(item);
-					list.set(2, 100);//This operation will not cause copy on write because 
-					//the content referenced in the collection is changed and not the reference itself.
+					list.set(2, 100);// This operation will not cause copy on write because
+					// the content referenced in the collection is changed and not the reference
+					// itself.
 				}
 				System.out.println(list);
 				System.out.println("Size: " + list.size());
-				
+
 				System.out.println("CopyOnWriteArrayList Sample: [Ended]");
-				
+
 			} catch (Exception e) {
 				System.out.println(e);
 			}
@@ -511,19 +565,18 @@ public class ThreadsSynchronisationProg {
 
 			System.out.println("executeTest1(): [Started]");
 
-			System.out.println("With out Synchronisation Test: [Started]");
+			System.out.println("Without Synchronisation Test: [Started]");
 			Synchronisation.doTest(SYNCHRONISATION.WITHOUT);
 			Thread.sleep(THREE_SECONDS);
-			System.out.println("With out Synchronisation Test: [Ended]");
+			System.out.println("Without Synchronisation Test: [Ended]");
 			Thread.sleep(THREE_SECONDS);
 			System.out.println("With Synchronisation Test: [Started]");
 			Synchronisation.doTest(SYNCHRONISATION.WITH);
-			Thread.sleep(ELEVEN_SECONDS);
-			System.out.println("With out Synchronisation Test: [Ended]");
+			System.out.println("With Synchronisation Test: [Ended]");
 
 			System.out.println("executeTest1(): [Ended]");
 		}
-		
+
 		public static void executeTest2() throws InterruptedException {
 
 			System.out.println("executeTest2(): [Started]");
@@ -557,41 +610,38 @@ public class ThreadsSynchronisationProg {
 
 			System.out.println("executeTest3(): [Ended]");
 		}
-		
+
 		public static void executeTest4() throws InterruptedException {
-			
+
 			System.out.println("executeTest4(): [Started]");
-			
+
 			Synchronisation.doTest();
-			
+
 			System.out.println("executeTest4(): [Ended]");
 		}
 	}
 }
 
 /*
- * Note-1: Concurrent collection classes list:
- * ConcurrentHashMap - implements - ConcurrentMap - no ordering and no sorting.
- * ConcurrentLinkedDeque - implements - Deque - Ordering but no sorting.
- * ConcurrentLinkedQueue - implements - Queue - Ordering but no sorting.
- * ConcurrentSkipListMap - implements - ConcurrentMap, SortedMap, NavigableMap - Ordering and sorting.
- * 		(ConcurrentSkipListMap equivalent to TreeMap with concurrency)
- * ConcurrentSkipListSet - implements - SortedSet, NavigableSet - Ordering and sorting.
- * 		(ConcurrentSkipListMap equivalent to TreeSet with concurrency)
+ * Note-1: Concurrent collection classes list: ConcurrentHashMap - implements -
+ * ConcurrentMap - no ordering and no sorting. ConcurrentLinkedDeque -
+ * implements - Deque - Ordering but no sorting. ConcurrentLinkedQueue -
+ * implements - Queue - Ordering but no sorting. ConcurrentSkipListMap -
+ * implements - ConcurrentMap, SortedMap, NavigableMap - Ordering and sorting.
+ * (ConcurrentSkipListMap equivalent to TreeMap with concurrency)
+ * ConcurrentSkipListSet - implements - SortedSet, NavigableSet - Ordering and
+ * sorting. (ConcurrentSkipListMap equivalent to TreeSet with concurrency)
  * CopyOnWriteArrayList - implements - List - Ordering but no sorting.
  * CopyOnWriteArraySet - implements - Set - no ordering and no sorting.
- * LinkedBlockingDeque - implements - BlockingQueue, BlockingDeque - Ordering and blocking but no sorting.
- * LinkedBlockingQueue - implements - BlockingQueue - Ordering and blocking but no sorting.
+ * LinkedBlockingDeque - implements - BlockingQueue, BlockingDeque - Ordering
+ * and blocking but no sorting. LinkedBlockingQueue - implements - BlockingQueue
+ * - Ordering and blocking but no sorting.
  */
 
 /*
- * Note-2: Synchronized methods in Collections: 
- * synchronizedCollection(Collection<T> c) 
- * synchronizedList(List<T> list)
- * synchronizedMap(Map<K,V> m) 
- * synchronizedNavigableMap(NavigableMap<K,V> m)
- * synchronizedNavigableSet(NavigableSet<T> s) 
- * synchronizedSet(Set<T> s)
- * synchronizedSortedMap(SortedMap<K,V> m) 
- * synchronizedSortedSet(SortedSet<T> s)
+ * Note-2: Synchronized methods in Collections:
+ * synchronizedCollection(Collection<T> c) synchronizedList(List<T> list)
+ * synchronizedMap(Map<K,V> m) synchronizedNavigableMap(NavigableMap<K,V> m)
+ * synchronizedNavigableSet(NavigableSet<T> s) synchronizedSet(Set<T> s)
+ * synchronizedSortedMap(SortedMap<K,V> m) synchronizedSortedSet(SortedSet<T> s)
  */
