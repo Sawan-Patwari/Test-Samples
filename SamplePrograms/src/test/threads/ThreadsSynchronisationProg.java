@@ -458,8 +458,8 @@ public class ThreadsSynchronisationProg {
 				System.out.println("LinkedBlockingDeque Sample: [Ended]");
 				
 				System.out.println("CopyOnWriteArrayList Sample: [Started]");				
-				//Copies all of their elements to a new underlying structure any time an element is
-				//added, modified, or removed from the collection. In case of modified scenario, 
+				//Copies all of the elements to a new underlying structure any time an element is
+				//added, modified, or removed from the collection. In case of modified scenario, copy will happen
 				//if the reference in the collection is changed (add(index, element)) but not if the content
 				//of the reference is changed as in the case of set(index, element) operation.
 				List<Integer> list = new CopyOnWriteArrayList<>(Arrays.asList(1, 2, 3));
