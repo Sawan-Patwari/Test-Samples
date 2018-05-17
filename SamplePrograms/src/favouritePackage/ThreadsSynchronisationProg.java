@@ -177,24 +177,72 @@ public class ThreadsSynchronisationProg {
 				System.out.println("Sub-Test-2: [Started]");
 				Thread.sleep(THREE_SECONDS);
 
+				/*
+				 * This class is not completely thread-safe as only one of the two methods is
+				 * thread-safe.
+				 */
 				class CollectionsSynchronizedMethodsTest {
 					private List<Integer> list = Collections
 							.synchronizedList(new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
-					
-					//Synchronized methods of Collections class will not synchronize iterator based code, but only get and set based operations. 
-					//Need explicit synchronized block if the code is accessed by multiple threads.
-					public void doUnsynchronizedIteratorTest() {
+
+					/*
+					 * Synchronized methods of Collections class will not synchronize iterator based
+					 * code, but only get and set based operations. Need explicit synchronized block
+					 * if the code is accessed by multiple threads. Thus, this method shouldn't be
+					 * executed in a multi-thread environment.
+					 */
+					public void doUnsynchronizedIteratorTest() {// not a thread-safe method.
 						System.out.println();
 						for (int element : list)
 							System.out.print(element + " ");
 						System.out.println();
 					}
 
-					//Synchronized methods of Collections class will not synchronize iterator based code, but only get and set based operations. 
-					//Need explicit synchronized block if the code is accessed by multiple threads.
-					public void doSynchronizedIteratorTest() {
+					/*
+					 * Synchronized methods of Collections class will not synchronize iterator based
+					 * code, but only get and set based operations. Need explicit synchronized block
+					 * if the code is accessed by multiple threads. Thus, the below method can be
+					 * run in a multi-threaded environment.
+					 */
+					public void doSynchronizedIteratorTest() {// a thread-safe method.
+						/*
+						 * Method could have been marked as synchronized in which case below
+						 * synchronized block would become redundant.
+						 */
 
+						/*
+						 * {
+						 * 
+						 * Common code/activity block which can be done by multiple threads
+						 * concurrently/simultaneously, in which case, using synchronized blocks would
+						 * increase the system performance instead of making the methods as
+						 * synchronized.
+						 * 
+						 * }
+						 */
+
+						/*
+						 * The below two lines will be incorrect as new Object instance is used for
+						 * every thread call on this method.
+						 * 
+						 * Object obj = new Object(); synchronized (obj) {
+						 * 
+						 */
+
+						/*
+						 * Below line can also be used.
+						 * 
+						 * synchronized (CollectionsSynchronizedMethodsTest.class) {
+						 */
 						synchronized (list) {
+							/* synchronized (this) { //This will also work. */
+							/*
+							 * 
+							 * This block of code needs to be executed in a single-threaded fashion as a
+							 * shared resource is being accessed/used, in order to maintain data
+							 * integrity/consistency/synchronization of the shared resource/data.
+							 * 
+							 */
 							System.out.println();
 							for (int element : list)
 								System.out.print(element + " ");
@@ -228,13 +276,16 @@ public class ThreadsSynchronisationProg {
 			} finally {
 				if (service != null)
 					service.shutdown();
-				// Below call is not needed, quite frankly, because the wait times for the main
-				// thread are already in place inside this method.
+
+				/*
+				 * Below call is not needed, quite frankly, because the wait times for the main
+				 * thread are already in place inside this method.
+				 */
 				// service.awaitTermination(ONE_MINUTE, TimeUnit.MINUTES);
 			}
 		}
 
-		private static void doTest(CONCURRENT_API option) {
+		private static void doTest(CONCURRENT_API option) throws InterruptedException {
 
 			abstract class API {
 				abstract void createData();
@@ -245,7 +296,7 @@ public class ThreadsSynchronisationProg {
 
 				abstract Map<Integer, Integer> getWholeData();
 
-				void runTest(ExecutorService service) {
+				void runTest(ExecutorService service) throws InterruptedException {
 
 					this.reset();
 
@@ -272,12 +323,7 @@ public class ThreadsSynchronisationProg {
 							}
 						});
 
-					try {
-						Thread.sleep(THREE_SECONDS);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						System.out.println(e);
-					}
+					Thread.sleep(THREE_SECONDS);
 
 					System.out.println("Displaying data by using a Single Thread:");
 					this.getWholeData().forEach((k, v) -> System.out.println(v));
@@ -341,18 +387,22 @@ public class ThreadsSynchronisationProg {
 
 						private Map<Integer, Integer> data = new HashMap<Integer, Integer>();
 
-						// 'synchronized' keyword not needed as it is a private access. The method
-						// which accesses this method should be synchronized if it is a public method
-						// and will be accessed by multiple threads else don't use the
-						// 'synchronized' keyword to even that method as well.
+						/*
+						 * 'synchronized' keyword not needed as it is a private access. The method which
+						 * accesses this method should be synchronized if it is a public method and will
+						 * be accessed by multiple threads else don't use the 'synchronized' keyword to
+						 * even that method as well.
+						 */
 						private void put(Integer key, Integer value) {
 							data.put(key, value);
 						}
 
-						// 'synchronized' keyword not needed as it is a private access. The method
-						// which accesses this method should be synchronized if it is a public method
-						// and will be accessed by multiple threads else don't use the
-						// 'synchronized' keyword to even that method as well.
+						/*
+						 * 'synchronized' keyword not needed as it is a private access. The method which
+						 * accesses this method should be synchronized if it is a public method and will
+						 * be accessed by multiple threads else don't use the 'synchronized' keyword to
+						 * even that method as well.
+						 */
 						private Integer get(Integer key) {
 							return data.get(key);
 						}
@@ -367,16 +417,20 @@ public class ThreadsSynchronisationProg {
 							return get(initialGetPointer);
 						}
 
-						// This method doesn't need synchronization as it will be called
-						// by a single thread.
+						/*
+						 * This method doesn't need synchronization as it will be called by a single
+						 * thread.
+						 */
 						public void reset() {
 							initialPutPointer = 0;
 							initialGetPointer = 0;
 							data.clear();
 						}
 
-						// This method doesn't need synchronization as it will be called
-						// by a single thread.
+						/*
+						 * This method doesn't need synchronization as it will be called by a single
+						 * thread.
+						 */
 						@Override
 						Map<Integer, Integer> getWholeData() {
 							// TODO Auto-generated method stub
@@ -475,19 +529,22 @@ public class ThreadsSynchronisationProg {
 
 				System.out.println("ConcurrentLinkedQueue Sample: [Started]");
 				Queue<Integer> queue = new ConcurrentLinkedQueue<>();
-				// true if inserts (at front -head) else false but no exception thrown if it
-				// cannot
-				// insert due to capacity constraints unlike in add.
+				/*
+				 * true if inserts (at front -head) else false but no exception thrown if it
+				 * cannot insert due to capacity constraints unlike in add.
+				 */
 				queue.offer(12);
 				System.out.println(queue.peek());// only selects the head
 				System.out.println(queue.poll());// selects and removes the head
 				System.out.println("ConcurrentLinkedQueue Sample: [Ended]");
 
 				System.out.println("ConcurrentLinkedDeque Sample: [Started]");
-				Deque<Integer> deque = new ConcurrentLinkedDeque<>();// generally, meant for stack operations.
-				// true if inserts (at the tail end - last) else false but no exception thrown
-				// if it cannot
-				// insert due to capacity constraints unlike in add.
+				/*
+				 * generally, meant for stack operations. true if inserts (at the tail end -
+				 * last) else false but no exception thrown if it cannot insert due to capacity
+				 * constraints unlike in add.
+				 */
+				Deque<Integer> deque = new ConcurrentLinkedDeque<>();
 				deque.offer(6);// Also, same as offerLast().
 				deque.push(23);// Also, same as addFirst(). Exception thrown if no space.
 				System.out.println(deque.peek());// Same as peekFirst() - only selects first element.
@@ -525,13 +582,13 @@ public class ThreadsSynchronisationProg {
 				System.out.println("LinkedBlockingDeque Sample: [Ended]");
 
 				System.out.println("CopyOnWriteArrayList Sample: [Started]");
-				// Copies all of the elements to a new underlying structure any time an element
-				// is
-				// added, modified, or removed from the collection. In case of modified
-				// scenario, copy will happen
-				// if the reference in the collection is changed (add(index, element)) but not
-				// if the content
-				// of the reference is changed as in the case of set(index, element) operation.
+				/*
+				 * Copies all of the elements to a new underlying structure any time an element
+				 * is added, modified, or removed from the collection. In case of modified
+				 * scenario, copy will happen if the reference in the collection is changed
+				 * (add(index, element)) but not if the content of the reference is changed as
+				 * in the case of set(index, element) operation.
+				 */
 				List<Integer> list = new CopyOnWriteArrayList<>(Arrays.asList(1, 2, 3));
 				int i = 4;
 				for (Integer item : list) {
@@ -550,9 +607,11 @@ public class ThreadsSynchronisationProg {
 
 				for (Integer item : list) {
 					System.out.println(item);
-					list.set(2, 100);// This operation will not cause copy on write because
-					// the content referenced in the collection is changed and not the reference
-					// itself.
+					/*
+					 * This operation will not cause copy on write because the content referenced in
+					 * the collection is changed and not the reference itself.
+					 */
+					list.set(2, 100);
 				}
 				System.out.println(list);
 				System.out.println("Size: " + list.size());
