@@ -180,7 +180,9 @@ public class ThreadsSynchronisationProg {
 				class CollectionsSynchronizedMethodsTest {
 					private List<Integer> list = Collections
 							.synchronizedList(new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
-
+					
+					//Synchronized methods of Collections class will not synchronize iterator based code, but only get and set based operations. 
+					//Need explicit synchronized block if the code is accessed by multiple threads.
 					public void doUnsynchronizedIteratorTest() {
 						System.out.println();
 						for (int element : list)
@@ -188,6 +190,8 @@ public class ThreadsSynchronisationProg {
 						System.out.println();
 					}
 
+					//Synchronized methods of Collections class will not synchronize iterator based code, but only get and set based operations. 
+					//Need explicit synchronized block if the code is accessed by multiple threads.
 					public void doSynchronizedIteratorTest() {
 
 						synchronized (list) {
