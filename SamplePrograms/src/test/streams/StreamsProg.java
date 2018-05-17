@@ -81,46 +81,46 @@ public class StreamsProg {
 		CollectorsSample.partitioning();
 	}
 
-	static void randomNumGen() {
+	public static void randomNumGen() {
 		Stream<Double> randoms = Stream.generate(Math::random);
 		randoms.forEach(System.out::println);
 	}
 
-	static void iterate() {
+	public static void iterate() {
 		Stream<Integer> oddNumbers = Stream.iterate(1, n -> n + 2);
 		oddNumbers.forEach(System.out::println);
 	}
 
-	static void streamCounting() {
+	public static void streamCounting() {
 		Stream<String> s = Stream.of("monkeys", "gorillas", "bonobos");
 		// 3
 		System.out.println(s.count());
 	}
 
-	static void streamMin() {
+	public static void streamMin() {
 		Stream<String> s = Stream.of("bonobo", "monkeys", "apes");
 		Optional<String> min = s.min((s1, s2) -> s1.length() - s2.length());
 		min.ifPresent(System.out::println);
 	}
 
-	static void streamMax() {
+	public static void streamMax() {
 		Stream<String> s = Stream.of("bonobo", "monkeys", "apes");
 		Optional<String> max = s.max((s1, s2) -> s1.length() - s2.length());
 		max.ifPresent(System.out::println);
 	}
 
-	static void streamEmpty() {
+	public static void streamEmpty() {
 		Optional<?> minEmpty = Stream.empty().min((s1, s2) -> 0);
 		// false
 		System.out.println(minEmpty.isPresent());
 	}
 
-	static void firstFindAny() {
+	public static void firstFindAny() {
 		Stream<String> s = Stream.of("monkeys", "gorillas", "bonobos");
 		s.findAny().ifPresent(System.out::println);
 	}
 
-	static void matchSamples() {
+	public static void matchSamples() {
 		List<String> list = Arrays.asList("monkey", "2", "chimp");
 		Stream<String> infinite = Stream.generate(() -> "chimp");
 		Predicate<String> pred = x -> Character.isLetter(x.charAt(0));
@@ -153,13 +153,13 @@ public class StreamsProg {
 
 	}
 
-	static void streamForEach() {
+	public static void streamForEach() {
 		Stream<String> s = Stream.of("Monkeys\t", "Gorillas\t", "Bonobos");
 		// MonkeyGorillaBonobo
 		s.forEach(System.out::print);
 	}
 
-	static void streamReduce() {
+	public static void streamReduce() {
 		String[] array = new String[] { "s", "a", "w", "a", "n" };
 		String result = "";
 		for (String s : array)
@@ -196,7 +196,7 @@ public class StreamsProg {
 
 	}
 
-	static void streamCollector() {
+	public static void streamCollector() {
 		Stream<String> stream = Stream.of("s", "a", "w", "a", "n");
 		StringBuilder word = stream.collect(StringBuilder::new, StringBuilder::append, StringBuilder::append);
 		System.out.println(word);
@@ -214,26 +214,26 @@ public class StreamsProg {
 		System.out.println(set5);
 	}
 
-	static void streamFilters() {
+	public static void streamFilters() {
 		Stream<String> s = Stream.of("donkey", "godzilla", "bonobo");
 		s.filter(x -> x.startsWith("d")).forEach(System.out::println);
 		// donkey
 
 	}
 
-	static void streamDistinct() {
+	public static void streamDistinct() {
 		Stream<String> s = Stream.of("Luck", "Luck", "Luck", "donkey");
 		s.distinct().forEach(System.out::println);
 
 	}
 
-	static void streamSkipAndLimit() {
+	public static void streamSkipAndLimit() {
 		Stream<Integer> s = Stream.iterate(1, n -> n + 1);
 
 		s.skip(5).limit(2).forEach(System.out::println);
 	}
 
-	static void streamMap() {
+	public static void streamMap() {
 		Stream<String> s = Stream.of("Luck1", "Luck12", "Luck234", "donkey");
 
 		System.out.println("streamMap");
@@ -246,7 +246,7 @@ public class StreamsProg {
 	 * want to remove empty elements from a stream or you want to combine a stream
 	 * of lists.
 	 */
-	static void streamFlatMap() {
+	public static void streamFlatMap() {
 		System.out.println("Method Name:" + "streamFlatMap");
 		List<String> zero = Arrays.asList();
 		List<String> one = Arrays.asList("Yakku");
@@ -256,7 +256,7 @@ public class StreamsProg {
 		// animals.flatMap(l -> Stream.of("A")).forEach(System.out::println);
 	}
 
-	static void streamSort() {
+	public static void streamSort() {
 		Stream<String> s = Stream.of("white", "black");
 		s.sorted().forEach(System.out::println);
 
@@ -275,7 +275,7 @@ public class StreamsProg {
 		 */
 	}
 
-	static void streamPeek() {
+	public static void streamPeek() {
 		Stream<String> stream = Stream.of("junk1", "junk2", "junk3", "junk33", "junk34");
 		long count = stream.filter(s -> s.startsWith("junk3")).peek(System.out::println).count();
 		System.out.println(count);
@@ -287,7 +287,7 @@ public class StreamsProg {
 		 */
 	}
 
-	static void streamPeek1() {
+	public static void streamPeek1() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "streamPeek1");
 		List<Integer> numbers = new ArrayList<>();
@@ -329,7 +329,7 @@ public class StreamsProg {
 		System.out.println("************");
 	}
 
-	static void streamPiplining() {
+	public static void streamPiplining() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "streamPiplining");
 		List<String> list = Arrays.asList("Magna", "Maga", "Mera", "Mighty");
@@ -337,11 +337,11 @@ public class StreamsProg {
 		System.out.println("************");
 	}
 
-	static void neverCallThisMethod() {
+	public static void neverCallThisMethod() {
 		Stream.generate(() -> "1234").filter(n -> n.length() == 4).sorted().limit(2).forEach(System.out::println);
 	}
 
-	static void neverCallThisMethod1() {
+	public static void neverCallThisMethod1() {
 		/*
 		 * It actually hangs until you kill the program or it throws an exception after
 		 * running out of memory. The foreman has instructed sorted() to wait until
@@ -353,11 +353,11 @@ public class StreamsProg {
 
 	}
 
-	static void fixForNeverCallThisMethod1() {
+	public static void fixForNeverCallThisMethod1() {
 		Stream.generate(() -> "1234").filter(n -> n.length() == 4).limit(2).sorted().forEach(System.out::println);
 	}
 
-	static void neverCallThisMethod2() {
+	public static void neverCallThisMethod2() {
 		/*
 		 * This one hangs as well until we kill the program. The filter doesn’t allow
 		 * anything through, so limit() never sees two elements. This means that we have
@@ -367,26 +367,26 @@ public class StreamsProg {
 
 	}
 
-	static void streamIterate() {
+	public static void streamIterate() {
 		Stream<Integer> infinite = Stream.iterate(1, x -> x + 1);
 		infinite.filter(x -> x % 2 == 1).limit(5).forEach(System.out::print);
 	}
 
-	static void printStreamDiffWays() {
+	public static void printStreamDiffWays() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "printStreamDiffWays");
 		Stream<List<?>> stream = getStreamSample();
 		stream.forEach(System.out::println);
 	}
 
-	static void printStreamDiffWays1() {
+	public static void printStreamDiffWays1() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "printStreamDiffWays1");
 		Stream<List<?>> stream = getStreamSample();
 		System.out.println(stream.collect(Collectors.toList()));
 	}
 
-	static void printStreamDiffWays2() {
+	public static void printStreamDiffWays2() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "printStreamDiffWays2");
 		// Stream<String> stream = Stream.of("1","2","3","4");//didn't work.
@@ -394,14 +394,14 @@ public class StreamsProg {
 		stream.peek(System.out::println).count();// didn't work.
 	}
 
-	static void printStreamDiffWays3() {
+	public static void printStreamDiffWays3() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "printStreamDiffWays3");
 		Stream<String> stream = Stream.of("1", "2", "3", "4");
 		stream.limit(5).forEach(System.out::println);
 	}
 
-	static Stream<List<?>> getStreamSample() {
+	public static Stream<List<?>> getStreamSample() {
 		List<Integer> numbers = new ArrayList<>();
 		List<Character> letters = new ArrayList<>();
 		numbers.add(1);
@@ -416,7 +416,7 @@ public class StreamsProg {
 		return stream;
 	}
 
-	static void streamIntPrimitives() {
+	public static void streamIntPrimitives() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "streamIntPrimitives");
 		Stream<Integer> stream = Stream.of(1, 2, 3);
@@ -472,7 +472,7 @@ public class StreamsProg {
 
 	}
 
-	static void optionalWithPrimitiveStreams() {
+	public static void optionalWithPrimitiveStreams() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "optionalWithPrimitiveStreams");
 		IntStream stream = IntStream.rangeClosed(1, 20);
@@ -493,7 +493,7 @@ public class StreamsProg {
 	 * average, size, and the number of values in the stream. Helpful because We
 	 * can’t run two terminal operations against the same stream.
 	 */
-	static void rangeCalculation() {
+	public static void rangeCalculation() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "rangeCalculation");
 		IntStream instream = IntStream.of(15, 10, 20, 1, 29, 91);
@@ -501,7 +501,7 @@ public class StreamsProg {
 		System.out.println(stats.getMax() - stats.getMin());
 	}
 	
-	static void deferredExecution() {
+	public static void deferredExecution() {
 		System.out.println("************");
 		System.out.println("Method Name:" + "deferredExecution");
 		List<String> counter = new ArrayList<>();
@@ -518,7 +518,7 @@ public class StreamsProg {
 		}catch(java.lang.IllegalStateException e) {System.out.println(e);}
 	}
 	
-	static void streamsWithOptionals() {
+	public static void streamsWithOptionals() {
 		Optional<Integer> optional = Optional.of(1234);
 		printIf4DigitRegular(optional);
 		printIf4DigitWithStreams(optional);
@@ -529,7 +529,7 @@ public class StreamsProg {
 		
 	}
 	
-	static void printIf4DigitRegular(Optional<Integer> optional) {
+	public static void printIf4DigitRegular(Optional<Integer> optional) {
 		if (optional.isPresent()) {
 
 			Integer num = optional.get();
@@ -540,13 +540,13 @@ public class StreamsProg {
 		}
 	}
 	
-	static void printIf4DigitWithStreams(Optional<Integer> optional) {
+	public static void printIf4DigitWithStreams(Optional<Integer> optional) {
 		optional.map(n -> "" + n)
 		.filter(s -> s.length() == 4)
 		.ifPresent(System.out::println);
 	}
 	
-	static void checkedExcepWithFISample1() {
+	public static void checkedExcepWithFISample1() {
 		
 		class CheckedExcepWithFI{
 			public List<String> testMethod() throws FileNotFoundException {
@@ -572,7 +572,7 @@ public class StreamsProg {
 	}
 	
 	//Not having dynamic line number to have clean syntax for functional programming code.
-	static void checkedExcepWithFISample2() {
+	public static void checkedExcepWithFISample2() {
 		
 		class CheckedExcepWithFI {
 			
@@ -634,7 +634,7 @@ public class StreamsProg {
 
 	}
 		
-	static void checkedExcepWithFISample3() {
+	public static void checkedExcepWithFISample3() {
 		
 		class CheckedExcepWithFI {
 			
@@ -702,7 +702,7 @@ public class StreamsProg {
 
 	}
 	
-	static class ChainingOptionals {// static class because there is at least one static method.
+	static class ChainingOptionals {// public static class because there is at least one public static method.
 		public static Optional<Integer> computeLength(String s) {
 			if(s!= null) {
 				return Optional.of(s.length());
@@ -713,11 +713,11 @@ public class StreamsProg {
 
 	}
 	
-	static void chainingOptionals() {
+	public static void chainingOptionals() {
 		System.out.println("Inside chainingOptionals().");
-		//static class ChainingOptionals {//Not permitted within a method.
-		class ChainingOptionals1 {// local classes cannot be static.
-			//public static Optional<Integer> computeLength(String s) { //Cannot do this.
+		//public static class ChainingOptionals {//Not permitted within a method.
+		class ChainingOptionals1 {// local classes cannot be public static.
+			//public public static Optional<Integer> computeLength(String s) { //Cannot do this.
 			public Optional<Integer> computeLength(String s) {
 				if(s!= null) {
 					return Optional.of(s.length());
@@ -745,12 +745,12 @@ public class StreamsProg {
 		 */
 	}
 	
-	//Nested classes can be static.
-	static class CollectorsSample {
-		static String[] stringValues = {"lions", "tigers", "bears", 
+	//Nested classes can be public static.
+	public static class CollectorsSample {
+		public static String[] stringValues = {"lions", "tigers", "bears", 
 				"Godzilla", "Vampire", "Elephant", "Humans", "Apes", "Monkeys"};
 		
-		static void joining() {
+		public static void joining() {
 			System.out.println("Inside the method: CollectorsSample.joining()");
 			Stream<String> streamSample = Stream.of(stringValues);
 			String result = streamSample.collect(Collectors.joining(", "));
@@ -760,7 +760,7 @@ public class StreamsProg {
 			 */
 		}
 		
-		static void averagingInt() {
+		public static void averagingInt() {
 			Stream<String> streamSample = Stream.of(stringValues);
 			Double result = streamSample.collect(Collectors.averagingInt(String::length));
 			System.out.println(result);
@@ -771,7 +771,7 @@ public class StreamsProg {
 			 */
 		}
 		
-		static void toCollection() {
+		public static void toCollection() {
 			Stream<String> streamSample = Stream.of(stringValues);
 			TreeSet<String> result = streamSample.filter(s -> s.startsWith("t"))
 			.collect(Collectors.toCollection(TreeSet::new));
@@ -782,7 +782,7 @@ public class StreamsProg {
 			 */
 		}
 		
-		static void toMap() {
+		public static void toMap() {
 			Stream<String> streamSample = Stream.of(stringValues);
 			Map<String, Integer> map = streamSample.collect(
 			Collectors.toMap(s -> s, String::length));
@@ -810,7 +810,7 @@ public class StreamsProg {
 			
 		}
 		
-		static void summarizingInt() {
+		public static void summarizingInt() {
 			System.out.println("Inside CollectorsSample.summarizingInt():");
 			Stream<String> streamSample = Stream.of(stringValues);
 			IntSummaryStatistics intSummaryStats = streamSample.collect(Collectors.summarizingInt(String::length));
@@ -822,7 +822,7 @@ public class StreamsProg {
 			 */
 		}
 		
-		static void summingInt() {
+		public static void summingInt() {
 			System.out.println("Inside CollectorsSample.summingInt():");
 			Stream<String> streamSample = Stream.of(stringValues);
 			Integer sum = streamSample.collect(Collectors.summingInt(String::length));
@@ -835,14 +835,14 @@ public class StreamsProg {
 			 */
 		}
 		
-		static void counting() {
+		public static void counting() {
 			System.out.println("Inside CollectorsSample.counting():");
 			Stream<String> streamSample = Stream.of(stringValues);
 			Long sum = streamSample.collect(Collectors.counting());
 			System.out.println(sum);
 		}
 		
-		static void getMaxAndMinBy() {
+		public static void getMaxAndMinBy() {
 			System.out.println("Inside CollectorsSample.getMaxAndMinBy():");
 			
 			//Comparator<String> ascendingOrder = (s1, s2) -> s1.compareTo(s2);
@@ -874,7 +874,7 @@ public class StreamsProg {
 
 		}
 		
-		static void groupingBy() {
+		public static void groupingBy() {
 			System.out.println("Inside CollectorsSample.groupingBy():");
 			
 			Stream<String> streamSample = Stream.of(stringValues);
@@ -909,7 +909,7 @@ public class StreamsProg {
 					String::length, Collectors.counting()));
 			System.out.println(map4);
 			
-			//Local classes (classes within methods of a class) cannot be static.
+			//Local classes (classes within methods of a class) cannot be public static.
 			class GroupingAndMappingSamples{
 				{System.out.println("GroupingAndMappingSamples Output: [Start]");}
 				
@@ -968,7 +968,7 @@ public class StreamsProg {
 			new GroupingAndMappingSamples();			
 		}
 		
-		static void partitioning() {
+		public static void partitioning() {
 			System.out.println("Inside CollectorsSample.partitioning():");
 			
 			System.out.println("partitioning() sample-1:");
@@ -1077,9 +1077,9 @@ public class StreamsProg {
  */
 
 /*
- * Note-5: Nested classes can be static (which means this class can have static methods). 
+ * Note-5: Nested classes can be public static (which means this class can have public static methods). 
  * But, local classes (classes with methods of another class) 
- * cannot be static (which means this class cannot have static methods). Classes other 
+ * cannot be public static (which means this class cannot have public static methods). Classes other 
  * than the file names cannot be static(obviously).
  */
 //**********************
