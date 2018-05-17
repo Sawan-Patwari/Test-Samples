@@ -396,8 +396,8 @@ public class ThreadsSynchronisationProg {
 					System.out.println("{Collections.synchronizedList Sub-Test-2}:[Started]");
 					List<Integer> list = Collections.synchronizedList(new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5)));
 					synchronized (list) {
-					//synchronizedList will not synchronize iterator based code. Need explicit synchronized block
-					//if the code is accessed by multiple threads.
+					//Synchronized methods of Collections class will not synchronize iterator based code, but only get and set based operations. 
+					//Need explicit synchronized block if the code is accessed by multiple threads.
 						for (int element : list)
 							System.out.print(element + " ");
 					}
