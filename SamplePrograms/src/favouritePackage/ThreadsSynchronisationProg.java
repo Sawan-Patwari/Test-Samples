@@ -562,9 +562,9 @@ public class ThreadsSynchronisationProg {
  * ConcurrentLinkedDeque - implements - Deque - Ordering but no sorting.
  * ConcurrentLinkedQueue - implements - Queue - Ordering but no sorting.
  * ConcurrentSkipListMap - implements - ConcurrentMap, SortedMap, NavigableMap - Ordering and sorting.
- * 		(ConcurrentSkipListMap equivalent to TreeMap without concurrency)
+ * 		(ConcurrentSkipListMap equivalent to TreeMap with concurrency)
  * ConcurrentSkipListSet - implements - SortedSet, NavigableSet - Ordering and sorting.
- * 		(ConcurrentSkipListMap equivalent to TreeSet without concurrency)
+ * 		(ConcurrentSkipListMap equivalent to TreeSet with concurrency)
  * CopyOnWriteArrayList - implements - List - Ordering but no sorting.
  * CopyOnWriteArraySet - implements - Set - no ordering and no sorting.
  * LinkedBlockingDeque - implements - BlockingQueue, BlockingDeque - Ordering and blocking but no sorting.
