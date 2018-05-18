@@ -10,8 +10,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -22,12 +25,19 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 /**
  * 
  * @author Sawan.Patwari
  *
  */
 public class StreamsProg {
+	
+	private static String[] stringValues = {"lions", "tigers", "bears", 
+			"Godzilla", "Vampire", "Elephant", "Humans", "Apes", "Monkeys"};
+	
+	private static final String[] words = {"s","a","w","a","n"};
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -69,6 +79,7 @@ public class StreamsProg {
 		checkedExcepWithFISample2();
 		checkedExcepWithFISample3();
 		chainingOptionals();
+		
 		CollectorsSample.joining();
 		CollectorsSample.averagingInt();
 		CollectorsSample.toCollection();
@@ -79,6 +90,15 @@ public class StreamsProg {
 		CollectorsSample.getMaxAndMinBy();
 		CollectorsSample.groupingBy();		
 		CollectorsSample.partitioning();
+		
+		ParallelStreams.displayContentUsingParallelStreamWithFix();
+		ParallelStreams.displayContentUsingNonParallelStream();
+		ParallelStreams.doConcatWordsParallelly();
+		ParallelStreams.doConcurrentCollect();
+		ParallelStreams.getNonConcurrentCollectorSet();
+		ParallelStreams.getConcurrentCollectorList();
+		ParallelStreams.doConcurrentMapSample();
+		ParallelStreams.doConcurrentGroupBySample();
 	}
 
 	public static void randomNumGen() {
@@ -92,19 +112,19 @@ public class StreamsProg {
 	}
 
 	public static void streamCounting() {
-		Stream<String> s = Stream.of("monkeys", "gorillas", "bonobos");
+		Stream<String> s = Stream.of(stringValues);
 		// 3
 		System.out.println(s.count());
 	}
 
 	public static void streamMin() {
-		Stream<String> s = Stream.of("bonobo", "monkeys", "apes");
+		Stream<String> s = Stream.of(stringValues);
 		Optional<String> min = s.min((s1, s2) -> s1.length() - s2.length());
 		min.ifPresent(System.out::println);
 	}
 
 	public static void streamMax() {
-		Stream<String> s = Stream.of("bonobo", "monkeys", "apes");
+		Stream<String> s = Stream.of(stringValues);
 		Optional<String> max = s.max((s1, s2) -> s1.length() - s2.length());
 		max.ifPresent(System.out::println);
 	}
@@ -116,7 +136,7 @@ public class StreamsProg {
 	}
 
 	public static void firstFindAny() {
-		Stream<String> s = Stream.of("monkeys", "gorillas", "bonobos");
+		Stream<String> s = Stream.of(stringValues);
 		s.findAny().ifPresent(System.out::println);
 	}
 
@@ -197,19 +217,19 @@ public class StreamsProg {
 	}
 
 	public static void streamCollector() {
-		Stream<String> stream = Stream.of("s", "a", "w", "a", "n");
+		Stream<String> stream = Stream.of(words);
 		StringBuilder word = stream.collect(StringBuilder::new, StringBuilder::append, StringBuilder::append);
 		System.out.println(word);
 
-		Stream<String> stream2 = Stream.of("s", "a", "w", "a", "n");
+		Stream<String> stream2 = Stream.of(words);
 		TreeSet<String> set = stream2.collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
 		System.out.println(set);
 
-		Stream<String> stream4 = Stream.of("s", "a", "w", "a", "n");
+		Stream<String> stream4 = Stream.of(words);
 		TreeSet<String> set2 = stream4.collect(Collectors.toCollection(TreeSet::new));
 		System.out.println(set2);
 
-		Stream<String> stream5 = Stream.of("w", "o", "l", "f");
+		Stream<String> stream5 = Stream.of(words);
 		Set<String> set5 = stream5.collect(Collectors.toSet());
 		System.out.println(set5);
 	}
@@ -746,9 +766,7 @@ public class StreamsProg {
 	}
 	
 	//Nested classes can be public static.
-	public static class CollectorsSample {
-		public static String[] stringValues = {"lions", "tigers", "bears", 
-				"Godzilla", "Vampire", "Elephant", "Humans", "Apes", "Monkeys"};
+	public static class CollectorsSample {		
 		
 		public static void joining() {
 			System.out.println("Inside the method: CollectorsSample.joining()");
@@ -989,6 +1007,128 @@ public class StreamsProg {
 		}
 	}
 	
+	public static class ParallelStreams{
+		private final Integer[] content = {1,2,3,4,5,6,7,8,9,10};
+		
+		private int displayContent(long outputRowNumber) {
+			System.out.print(outputRowNumber+":");
+			System.out.println(ToStringBuilder.reflectionToString(content));
+			System.out.println();
+			return 0;
+		}
+		
+		/**
+		 * This method doesn't kick-off displayContent(long outputRowNumber) call.
+		 */
+		@Deprecated
+		public static void displayContentUsingParallelStream() {
+			
+			ParallelStreams sample = new ParallelStreams();
+			
+			long start = System.currentTimeMillis();
+			Stream<Long> displayTimes = Stream.iterate(1l, n -> n+1).limit(99_00_000);
+			long count = displayTimes.parallel().map(i -> sample.displayContent(i)).count();			
+			System.out.println(count);
+			double time = (System.currentTimeMillis()-start)/1000.0;
+			
+			System.out.println("Tasks completed in: "+time+" seconds");
+		}
+		
+		public static void displayContentUsingParallelStreamWithFix() {
+			
+			ParallelStreams sample = new ParallelStreams();
+			long start = System.currentTimeMillis();
+			Stream<Long> displayTimes = Stream.iterate(1l, n -> n+1).limit(3*99_00_000);			
+			SortedSet<Long> x = displayTimes.collect(ConcurrentSkipListSet::new,Set::add,
+					Set::addAll);//unnecessary additional step.
+			double dataConversionTime = (System.currentTimeMillis()-start)/1000.0;
+			//System.out.println(x.parallelStream().isParallel());
+			x.parallelStream().map(i -> sample.displayContent(i)).count();			
+			double time = (System.currentTimeMillis()-start)/1000.0;
+			System.out.println("Data Conversion took: "+dataConversionTime+" seconds.");
+			System.out.println("Tasks completed in: "+time+" seconds");
+		}
+		
+		public static void displayContentUsingNonParallelStream() {
+			
+			ParallelStreams sample = new ParallelStreams();
+			long start = System.currentTimeMillis();
+			Stream<Long> displayTimes = Stream.iterate(1l, n -> n+1).limit(3*99_00_000);
+			displayTimes.map(i -> sample.displayContent(i)).count();
+			double time = (System.currentTimeMillis()-start)/1000.0;
+			
+			System.out.println("Tasks completed in: "+time+" seconds");
+		}
+		
+		public static void doConcatWordsParallelly() {
+			
+			String x = Arrays.asList(words)
+					.parallelStream()
+					.reduce("",(c,s1) -> c + s1,
+					(s2,s3) -> s2 + s3);
+			
+			System.out.println(x);
+		}
+		
+		public static void doConcurrentCollect() {
+			Stream<String> stream = Stream.of(words).parallel();
+			SortedSet<String> set = stream.
+					collect(ConcurrentSkipListSet::new, Set::add, Set::addAll);
+			System.out.println(set);
+		}
+		
+		/**
+		 * Collectors.toSet() does have the UNORDERED characteristic, but it does not
+		 * have the CONCURRENT characteristic; thus, this collect method
+		 * will not be performed as a concurrent reduction
+		 */
+		public static Set<String> getNonConcurrentCollectorSet() {
+			Stream<String> stream = Stream.of(words).parallel();
+			Set<String> set = stream.collect(Collectors.toSet());
+			System.out.println(set);
+			
+			return set;
+		}
+		
+		/**
+		 * Since data is transfered into List and the List needs ordering, this will
+		 * reduce the performance, as some operations will not be completed in
+		 * parallel.
+		 */
+		public static List<String> getConcurrentCollectorList() {
+			Stream<String> stream = Stream.of(words).parallel();
+			List<String> ls = stream.collect(Collectors.toList());
+			System.out.println(ls);
+			
+			return ls;
+		}
+
+		/**
+		 * Collectors.toConcurrentMap() has both UNORDERED and CONCURRENT
+		 * characteristics. Thus, it is capable of performing parallel reductions
+		 * efficiently unlike Collectors.toSet() and Collectors.toList().
+		 * 
+		 */
+		public static void doConcurrentMapSample() {
+			Stream<String> ps = Stream.of(stringValues).parallel();
+			ConcurrentMap<Integer, String> map = ps
+			.collect(Collectors.toConcurrentMap(String::length, k -> k,
+			(s1, s2) -> s1 + "," + s2));
+			System.out.println(map);
+		}
+		
+		/**
+		 * Collectors.groupingByConcurrent() also has both UNORDERED and CONCURRENT
+		 * characteristics. Thus, it is capable of performing parallel reductions
+		 * efficiently.
+		 */
+		public static void doConcurrentGroupBySample() {
+			Stream<String> ohMy = Stream.of(stringValues).parallel();
+			ConcurrentMap<Integer, List<String>> map = ohMy.collect(
+			Collectors.groupingByConcurrent(String::length));
+			System.out.println(map);
+		}
+	}
 
 }
 
