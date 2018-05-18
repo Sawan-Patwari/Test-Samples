@@ -92,6 +92,7 @@ public class StreamsProg {
 		CollectorsSample.partitioning();
 		
 		ParallelStreams.displayContentUsingParallelStreamWithFix();
+		ParallelStreams.displayContentParallellyWithConcurrentMap();
 		ParallelStreams.displayContentUsingNonParallelStream();
 		ParallelStreams.doConcatWordsParallelly();
 		ParallelStreams.doConcurrentCollect();
@@ -1010,6 +1011,8 @@ public class StreamsProg {
 	public static class ParallelStreams{
 		private final Integer[] content = {1,2,3,4,5,6,7,8,9,10};
 		
+		private final static long NUM_OF_DISPLAYS = 1_00_000;
+		
 		private int displayContent(long outputRowNumber) {
 			System.out.print(outputRowNumber+":");
 			System.out.println(ToStringBuilder.reflectionToString(content));
@@ -1026,7 +1029,7 @@ public class StreamsProg {
 			ParallelStreams sample = new ParallelStreams();
 			
 			long start = System.currentTimeMillis();
-			Stream<Long> displayTimes = Stream.iterate(1l, n -> n+1).limit(99_00_000);
+			Stream<Long> displayTimes = Stream.iterate(1l, n -> n+1).limit(NUM_OF_DISPLAYS);
 			long count = displayTimes.parallel().map(i -> sample.displayContent(i)).count();			
 			System.out.println(count);
 			double time = (System.currentTimeMillis()-start)/1000.0;
@@ -1038,8 +1041,24 @@ public class StreamsProg {
 			
 			ParallelStreams sample = new ParallelStreams();
 			long start = System.currentTimeMillis();
-			Stream<Long> displayTimes = Stream.iterate(1l, n -> n+1).limit(3*99_00_000);			
-			SortedSet<Long> x = displayTimes.collect(ConcurrentSkipListSet::new,Set::add,
+			Stream<Long> displayTimes = Stream.iterate(1l, n -> n+1).limit(NUM_OF_DISPLAYS);	
+			
+			/**
+			 * Parallel-collect is good for large data-sets else got to use serial-collect.
+			 * If the display row number is unimportant then can think of using
+			 * Collectors.toConcurrentMap() to collect the input stream - 'displayTimes'
+			 * instead of ConcurrentSkipListSet for better performance as we just need to
+			 * make displayContent() function calls for 'NUM_OF_DISPLAYS' times parallelly
+			 * to complete the independent task(displayContent()) at the earliest for
+			 * 'NUM_OF_DISPLAYS' times within less turn around time. The method -
+			 * displayContentParallellyWithConcurrentMap() can be referred.
+			 * 
+			 * Output Info:
+			 * Data Conversion took: 0.792 seconds. 
+			 * Tasks completed in: 3.293 seconds
+			 */
+			SortedSet<Long> x = displayTimes.parallel().collect(
+					ConcurrentSkipListSet::new,Set::add,
 					Set::addAll);//unnecessary additional step.
 			double dataConversionTime = (System.currentTimeMillis()-start)/1000.0;
 			//System.out.println(x.parallelStream().isParallel());
@@ -1049,11 +1068,43 @@ public class StreamsProg {
 			System.out.println("Tasks completed in: "+time+" seconds");
 		}
 		
+		/**
+		 * We need to use this approach if a method(independent and stateless) needs to
+		 * be executed multiple times parallelly with better performance since
+		 * Collectors.toConcurrentMap() has both UNORDERED and CONCURRENT
+		 * characteristics.
+		 * 
+		 * Output Info: Data Conversion took: 0.215 seconds. 
+		 * Tasks completed in: 3.287 seconds
+		 */
+		public static void displayContentParallellyWithConcurrentMap() {
+			
+			ParallelStreams sample = new ParallelStreams();
+			long start = System.currentTimeMillis();
+			Stream<Long> displayTimes = Stream.iterate(1l, n -> n+1).limit(NUM_OF_DISPLAYS);	
+						
+			Map<Long, Long> x = displayTimes.parallel().collect(
+					Collectors.toConcurrentMap(k -> k, v -> 1l));//unnecessary additional step.
+			double dataConversionTime = (System.currentTimeMillis()-start)/1000.0;
+			//System.out.println(x.parallelStream().isParallel());
+			
+			x.keySet().parallelStream().map(i -> sample.displayContent(i)).count();			
+			double time = (System.currentTimeMillis()-start)/1000.0;
+			System.out.println("Data Conversion took: "+dataConversionTime+" seconds.");
+			System.out.println("Tasks completed in: "+time+" seconds");
+		}
+		
+		/**
+		 * Serial-collect is better if data-set is less. 
+		 * 
+		 * Output Info:
+		 * Tasks completed in: 2.723 seconds
+		 */
 		public static void displayContentUsingNonParallelStream() {
 			
 			ParallelStreams sample = new ParallelStreams();
 			long start = System.currentTimeMillis();
-			Stream<Long> displayTimes = Stream.iterate(1l, n -> n+1).limit(3*99_00_000);
+			Stream<Long> displayTimes = Stream.iterate(1l, n -> n+1).limit(NUM_OF_DISPLAYS);
 			displayTimes.map(i -> sample.displayContent(i)).count();
 			double time = (System.currentTimeMillis()-start)/1000.0;
 			
