@@ -1072,7 +1072,13 @@ public class StreamsProg {
 		 * We need to use this approach if a method(independent and stateless) needs to
 		 * be executed multiple times parallelly with better performance since
 		 * Collectors.toConcurrentMap() has both UNORDERED and CONCURRENT
-		 * characteristics.
+		 * characteristics. In case of web application, for a request, this method
+		 * should be registered with the Executor Service, so that a thread will be
+		 * alive and dedicated for the completion of the execution of this method
+		 * instead of making the controller thread/request to be held for the same task.
+		 * If the web request is made to manage the execution and completion of this 
+		 * method without the Executor Service then it might cause request time-out 
+		 * issues or stuck threads issues on the server.
 		 * 
 		 * Output Info: Data Conversion took: 0.215 seconds. 
 		 * Tasks completed in: 3.287 seconds
