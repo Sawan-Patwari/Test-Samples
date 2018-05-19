@@ -1,5 +1,6 @@
 package test.threads.taskManagerDemo.task;
 
+
 /**
  * 
  * @author Sawan.Patwari
@@ -7,5 +8,17 @@ package test.threads.taskManagerDemo.task;
  */
 public interface Taskable {
 
+	enum TaskStatus {
+		IN_COMPLETE, IN_PROGRESS, COMPLETE;
+	}
+
+	void openTask();
+
+	void doTask();
+
+	void closeTask();
+
+	TaskStatus getTaskCurrentStatus();
+	
 	Number performTask();
 }
