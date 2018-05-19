@@ -17,7 +17,7 @@ public class TaskManager<T, R> {
 	protected Stream<T> tasks;
 
 	public void doTasksForeground() {
-		Map<? super T, ? super R> x = tasks.parallel().collect(Collectors.toConcurrentMap(k -> k, v -> 1l));// unnecessary
+		Map<? super T, ? super R> x = tasks.parallel().collect(Collectors.toConcurrentMap(k -> k, v -> 1));
 
 		x.keySet().parallelStream().map(i -> ((Taskable) i).performTask()).count();
 	}
