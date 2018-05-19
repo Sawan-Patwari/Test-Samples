@@ -70,7 +70,7 @@ public class ExecutorServiceProg {
 			// SingleThreadExecutor: no guarantee in the order of execution of tasks when
 			// more threads are created. Order of execution is preserved for small number
 			// of threads/tasks.
-			service = Executors.newSingleThreadExecutor();
+			
 			System.out.println("[Test Begin]");
 			service.execute(() -> System.out.println("Executing Task-1"));
 			service.execute(() -> {
