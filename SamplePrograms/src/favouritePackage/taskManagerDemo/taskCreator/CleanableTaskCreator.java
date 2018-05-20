@@ -19,7 +19,7 @@ public class CleanableTaskCreator extends TaskCreator<CleanableTask> {
 	Predicate<CleanableTask> isNull = k -> Objects.isNull(k);
 
 	/**
-	 * Caller needs to make sure that the Stream is not empty before processing.
+	 * 
 	 * 
 	 * @param numberOfTasks
 	 * @return
@@ -33,7 +33,7 @@ public class CleanableTaskCreator extends TaskCreator<CleanableTask> {
 	}
 
 	/**
-	 * Caller needs to make sure that the Stream is not empty before processing.
+	 * 
 	 * 
 	 * @param numberOfTasks
 	 * @return
@@ -47,7 +47,7 @@ public class CleanableTaskCreator extends TaskCreator<CleanableTask> {
 	}
 
 	/**
-	 * Caller needs to make sure that the Stream is not empty before processing.
+	 * 
 	 * 
 	 * @param numberOfTasks
 	 * @return
