@@ -25,29 +25,26 @@ public class TaskManager<T, R> {
 	public void doTasksBackground() {
 		ScheduledExecutorService scheduledService = Executors.newSingleThreadScheduledExecutor();
 
-		try {
-			Runnable task = () -> {
-	
-				doTasksForeground();
-			};
-	
-			scheduledService.schedule(task, 20, TimeUnit.SECONDS);
-			System.out.println("Process scheduled to run in background after 20 seconds.");
-			
-		}finally { 
-			if (scheduledService != null)
-				scheduledService.shutdown();
-		}
-		if (scheduledService != null) {
-			try {
-				scheduledService.awaitTermination(2l, TimeUnit.MINUTES);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
-		}
+		Runnable backgroundTask = () -> {
+			doTasksForeground();
+		};
+		
+		ShutDownService<ScheduledExecutorService> closeService = new 
+				ShutDownScheduledService(scheduledService, 1l);
+		
+		Runnable shutDownTask = () -> {
+			System.out.println("Kicked-off service shutdown.");
+			closeService.doShutDownService();
+		};
+		
+		scheduledService.schedule(backgroundTask, 20, TimeUnit.SECONDS);
+		scheduledService.schedule(shutDownTask, 40, TimeUnit.SECONDS);
+
+		System.out.println("Process scheduled to run in background after 20 seconds.");
+
 		System.out.println("Task Manager will shut-down now.");
 
 	}
 
 }
+
