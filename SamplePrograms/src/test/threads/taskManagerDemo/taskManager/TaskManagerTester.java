@@ -19,12 +19,12 @@ public class TaskManagerTester {
 				new CleanableTaskManager(tasks.getStreamOfBikeCleaningTasks(10));
 		
 		System.out.println("Foreground process will start.");
-		taskManager.doTasksForeground();
+		taskManager.doTasksInForeground();
 		System.out.println("Foreground process ended.");
 				
 		taskManager = 
 				new CleanableTaskManager(tasks.getStreamOfBikeCleaningTasks(2));
-		taskManager.doTasksBackground();
+		taskManager.doTasksInBackground();
 		
 	}
 

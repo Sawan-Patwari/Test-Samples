@@ -16,17 +16,17 @@ import test.threads.taskManagerDemo.task.Taskable;
 public class TaskManager<T, R> {
 	protected Stream<T> tasks;
 
-	public void doTasksForeground() {
+	public void doTasksInForeground() {
 		Map<? super T, ? super R> x = tasks.parallel().collect(Collectors.toConcurrentMap(k -> k, v -> 1));
 
 		x.keySet().parallelStream().map(i -> ((Taskable) i).performTask()).count();
 	}
 
-	public void doTasksBackground() {
+	public void doTasksInBackground() {
 		ScheduledExecutorService scheduledService = Executors.newSingleThreadScheduledExecutor();
 
 		Runnable backgroundTask = () -> {
-			doTasksForeground();
+			doTasksInForeground();
 		};
 		
 		ShutDownService<ScheduledExecutorService> closeService = new 
