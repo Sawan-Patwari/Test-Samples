@@ -21,6 +21,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 
@@ -35,6 +38,7 @@ public class ThreadsSynchronisationProg {
 		executeTest2();
 		executeTest3();
 		executeTest4();
+		executeTest5();
 	}
 
 	/**
@@ -84,6 +88,18 @@ public class ThreadsSynchronisationProg {
 			System.out.println(e);
 		}
 	}
+	
+	/**
+	 * I should be able to test this method easily from TestQuickProg.java as well.
+	 */
+	public static void executeTest5() {
+		try {
+			Synchronisation.executeTest5();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e);
+		}
+	}
 
 	private static class Synchronisation {
 
@@ -127,6 +143,17 @@ public class ThreadsSynchronisationProg {
 				this.option = option;
 			}
 
+		}
+		
+		enum RE_ENTRANT_RW_LOCK{
+			WITH(true), WITHOUT(false);
+
+			@SuppressWarnings("unused")
+			private boolean option;
+
+			RE_ENTRANT_RW_LOCK(boolean option) {
+				this.option = option;
+			}
 		}
 
 		// private void doDisplay(boolean isSynchronisationRequired) {
@@ -623,6 +650,153 @@ public class ThreadsSynchronisationProg {
 			}
 			System.out.println("General Synchronisation/Concurrency based API samples: [Ended]");
 		}
+		
+		private static void doTest(RE_ENTRANT_RW_LOCK option) {
+			
+			abstract class BaseTester {
+				
+				protected List<Integer> numbers = new ArrayList<>();
+				
+				protected void createInitialData() {
+					numbers.add(1);
+					numbers.add(2);
+					numbers.add(3);
+					numbers.add(4);
+					numbers.add(5);
+				}
+				
+				abstract protected int readNumber(int index);
+				abstract protected void writeNumber(int number, int index);
+				
+				public void runTest(ExecutorService service) {
+					
+					for (int i = 0; i < 40; i++) {
+						final int temp = i;
+						service.submit(() -> writeNumber(99999, temp));
+						service.submit(() -> readNumber(temp));
+					}
+					
+				}
+				
+			}
+			
+			ExecutorService service = null;
+			BaseTester tester = null;
+			try {
+				
+				service = Executors.newFixedThreadPool(60);
+				if (option == RE_ENTRANT_RW_LOCK.WITHOUT) {
+					
+					class WithoutReEntrantFeature extends BaseTester {
+						
+						public WithoutReEntrantFeature() {
+							createInitialData();
+						}
+
+						@Override
+						protected int readNumber(int index) {
+							// TODO Auto-generated method stub
+							System.out.print("Reading:");
+							int num = numbers.get(index % numbers.size());
+							System.out.println(num);
+							return num;
+						}
+
+						@Override
+						protected void writeNumber(int number, int index) {
+							// TODO Auto-generated method stub
+							int existingNum = numbers.get(index%numbers.size());
+							numbers.set(index, ++existingNum);
+							System.out.print("Writing:" + number +" " + numbers.get(index%numbers.size()));							
+							numbers.add(number);
+						}
+						
+					}
+					
+					tester = new WithoutReEntrantFeature();
+					tester.runTest(service);
+					
+				} else {
+					
+					/**
+					 * Reentrant Read-Write Lock: Read lock can be with many threads at a time, 
+					 * but write lock will always be with one of the many threads, and 
+					 * when a thread has a write lock, no other thread can read or write. 
+					 * This is a better solution compared to synchronized blocks or 
+					 * synchronized methods.
+					 * 					
+					 * @author Sawan.Patwari
+					 *
+					 */
+					class WithReEntrantFeature extends BaseTester {
+						
+						private ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+						
+						public WithReEntrantFeature() {
+							createInitialData();
+						}
+						
+						@Override
+						protected int readNumber(int index) {
+							// TODO Auto-generated method stub
+
+							Lock lock = readWriteLock.readLock();
+							try {
+								lock.lock();
+								int num = numbers.get(index % numbers.size());
+								System.out.print("Reading: Got Lock -" +num);								
+								return num;
+							} finally {
+								System.out.println("Read Lock Released.");
+								lock.unlock();
+							}
+						}
+
+						@Override
+						protected void writeNumber(int number, int index) {
+							// TODO Auto-generated method stub
+							Lock lock = readWriteLock.writeLock();
+
+							try {
+								lock.lock();
+								System.out.println("Writing: Got Lock.");
+								Thread.sleep(10);
+								int existingNum = numbers.get(index%numbers.size());
+								numbers.set(index, ++existingNum);
+								System.out.print("Writing:" + number +" " + numbers.get(index%numbers.size()));
+								numbers.add(number);
+								System.out.println(numbers);
+							} catch (InterruptedException e) {
+								System.out.println(e);
+							} finally {
+								System.out.println("Write Lock Released.");
+								lock.unlock();
+							}
+
+						}
+						
+					}
+					
+					tester = new WithReEntrantFeature();
+					tester.runTest(service);
+				}
+				
+			}catch(Exception e) {
+				System.out.println(e);
+			} finally {
+				if (service != null)
+					service.shutdown();
+				if (service != null) {
+					
+					try {
+						((ExecutorService) service).awaitTermination(1l, TimeUnit.MINUTES);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						System.out.println(e);
+					}			
+				}
+			}
+		}
 
 		public static void executeTest1() throws InterruptedException {
 
@@ -681,6 +855,22 @@ public class ThreadsSynchronisationProg {
 			Synchronisation.doTest();
 
 			System.out.println("executeTest4(): [Ended]");
+		}
+		
+		public static void executeTest5() throws InterruptedException {
+
+			System.out.println("executeTest5(): [Started]");
+
+			System.out.println("Without Re-entrant Read-Write Lock Test: [Started]");
+			Synchronisation.doTest(RE_ENTRANT_RW_LOCK.WITHOUT);
+			Thread.sleep(THREE_SECONDS);
+			System.out.println("Without Re-entrant Read-Write Lock Test: [Ended]");
+			Thread.sleep(THREE_SECONDS);
+			System.out.println("With Re-entrant Read-Write Lock Test: [Started]");
+			Synchronisation.doTest(RE_ENTRANT_RW_LOCK.WITH);
+			System.out.println("With Re-entrant Read-Write Lock Test: [Ended]");
+
+			System.out.println("executeTest5(): [Ended]");
 		}
 	}
 }
