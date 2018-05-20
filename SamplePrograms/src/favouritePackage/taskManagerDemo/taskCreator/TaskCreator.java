@@ -1,6 +1,7 @@
 package favouritePackage.taskManagerDemo.taskCreator;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -29,7 +30,7 @@ public class TaskCreator<T> {
 	}
 
 	/**
-	 * The Stream can have null objects. Caller needs to filter them.
+	 * 
 	 * 
 	 * @param numberOfTasks
 	 * @param clazz
@@ -53,7 +54,7 @@ public class TaskCreator<T> {
 			}
 		});
 
-		return streamOfTasks;
+		return streamOfTasks.filter(k -> !Objects.isNull(k));
 	}
 
 }

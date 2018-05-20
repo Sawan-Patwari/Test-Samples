@@ -16,8 +16,6 @@ import test.threads.taskManagerDemo.task.HouseCleaningTask;
  */
 public class CleanableTaskCreator extends TaskCreator<CleanableTask> {
 
-	Predicate<CleanableTask> ignoreNull = k -> !Objects.isNull(k);
-
 	Predicate<CleanableTask> isNull = k -> Objects.isNull(k);
 
 	/**
@@ -31,7 +29,7 @@ public class CleanableTaskCreator extends TaskCreator<CleanableTask> {
 		if (isNumberOfTasksInvalid(numberOfTasks))
 			numberOfTasks = 1;
 
-		return getStreamOfTasks(numberOfTasks, BikeCleaningTask.class).filter(ignoreNull);
+		return getStreamOfTasks(numberOfTasks, BikeCleaningTask.class);
 	}
 
 	/**
@@ -45,7 +43,7 @@ public class CleanableTaskCreator extends TaskCreator<CleanableTask> {
 		if (isNumberOfTasksInvalid(numberOfTasks))
 			numberOfTasks = 1;
 
-		return getStreamOfTasks(numberOfTasks, CarCleaningTask.class).filter(ignoreNull);
+		return getStreamOfTasks(numberOfTasks, CarCleaningTask.class);
 	}
 
 	/**
@@ -59,6 +57,6 @@ public class CleanableTaskCreator extends TaskCreator<CleanableTask> {
 		if (isNumberOfTasksInvalid(numberOfTasks))
 			numberOfTasks = 1;
 
-		return getStreamOfTasks(numberOfTasks, HouseCleaningTask.class).filter(ignoreNull);
+		return getStreamOfTasks(numberOfTasks, HouseCleaningTask.class);
 	}
 }
