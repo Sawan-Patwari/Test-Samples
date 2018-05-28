@@ -19,17 +19,24 @@ abstract public class ShutDownService<T>{
 	}
 	
 	protected void doShutDownService() {
-		if (service != null)
-			((ExecutorService)service).shutdown();
 		
-		if (service != null) {
-			System.out.println("Service shutdown awaiting termination for "+waitTimeInMinutes+" minute(s).");
-			try {
-				((ExecutorService) service).awaitTermination(waitTimeInMinutes, TimeUnit.MINUTES);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				System.out.println(e);
-			}			
+		if(service instanceof ExecutorService) {
+			if (service != null)
+				((ExecutorService)service).shutdown();
+			
+			if (service != null) {
+				System.out.println("Service shutdown awaiting termination for "+waitTimeInMinutes+" minute(s).");
+				try {
+					
+					((ExecutorService) service).awaitTermination(waitTimeInMinutes, TimeUnit.MINUTES);
+					
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					System.out.println(e);
+				}			
+			}
+		} else {
+			throw new UnsupportedOperationException("Service Shutdown operation not supported.");
 		}
 	}
 

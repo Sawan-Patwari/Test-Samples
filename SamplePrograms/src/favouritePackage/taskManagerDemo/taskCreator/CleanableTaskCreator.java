@@ -26,9 +26,6 @@ public class CleanableTaskCreator extends TaskCreator<CleanableTask> {
 	 */
 	public Stream<CleanableTask> getStreamOfBikeCleaningTasks(long numberOfTasks) {
 
-		if (isNumberOfTasksInvalid(numberOfTasks))
-			numberOfTasks = 1;
-
 		return getStreamOfTasks(numberOfTasks, BikeCleaningTask.class);
 	}
 
@@ -40,9 +37,6 @@ public class CleanableTaskCreator extends TaskCreator<CleanableTask> {
 	 */
 	public Stream<CleanableTask> getStreamOfCarCleaningTasks(long numberOfTasks) {
 
-		if (isNumberOfTasksInvalid(numberOfTasks))
-			numberOfTasks = 1;
-
 		return getStreamOfTasks(numberOfTasks, CarCleaningTask.class);
 	}
 
@@ -53,9 +47,6 @@ public class CleanableTaskCreator extends TaskCreator<CleanableTask> {
 	 * @return
 	 */
 	public Stream<CleanableTask> getStreamOfHouseCleaningTasks(long numberOfTasks) {
-
-		if (isNumberOfTasksInvalid(numberOfTasks))
-			numberOfTasks = 1;
 
 		return getStreamOfTasks(numberOfTasks, HouseCleaningTask.class);
 	}

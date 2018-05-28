@@ -37,7 +37,7 @@ public class TaskCreator<T> {
 	 * @return
 	 */
 	protected Stream<T> getStreamOfTasks(long numberOfTasks, Class<? extends T> clazz) {
-
+	//protected <V extends T> Stream<T> getStreamOfTasks(long numberOfTasks, Class<V> clazz) {
 		if (isNumberOfTasksInvalid(numberOfTasks))
 			numberOfTasks = 1;
 
