@@ -306,34 +306,51 @@ class FromJDK_1Dot7 implements FileOperations {
 		Files.lines(path).forEach(System.out::println);
 	}
 	
-	private static void processFileUsingStreams(String filePath, String...searchKeyword) throws IOException{
+	private static void doesFileLinesStartWithSearchKeyword(String filePath, String...searchKeywords) throws IOException{
 				
-		Predicate<String> searchFor = null;
-		Function<String, String> mapDisplayContent = s -> "Found "+s;
+		Predicate<String> matchFor = null;
+		Function<String, String> toDisplayContent = s -> "Found "+s;
 		
 		//if nothing to search then will display the file contents completely.
-		if (searchKeyword.length == 0) {
-			searchFor = s -> true;
-			mapDisplayContent = s -> s;
-		} else if (searchKeyword.length == 1) {
-			searchFor = s -> s.startsWith(searchKeyword[0]);
-		} else if (searchKeyword.length == 2) {
-			searchFor = s -> s.startsWith(searchKeyword[0]) || s.startsWith(searchKeyword[1]);
-		} else if (searchKeyword.length == 3) {
-			searchFor = s -> s.startsWith(searchKeyword[0]) || s.startsWith(searchKeyword[1])
-					|| s.startsWith(searchKeyword[2]);
-		} else if (searchKeyword.length == 4) {
-			searchFor = s -> s.startsWith(searchKeyword[0]) || s.startsWith(searchKeyword[1])
-					|| s.startsWith(searchKeyword[2]) || s.startsWith(searchKeyword[3]);
-		} else {
-			throw new IllegalArgumentException("Can support only 4 search keywords");
+		if (searchKeywords.length == 0) {
+			matchFor = s -> true;
+			toDisplayContent = s -> s;
+		}/* else if (searchKeywords.length == 1) {
+			searchFor = s -> s.startsWith(searchKeywords[0]);
+		} else if (searchKeywords.length == 2) {
+			searchFor = s -> s.startsWith(searchKeywords[0]) || s.startsWith(searchKeywords[1]);
+		} else if (searchKeywords.length == 3) {
+			searchFor = s -> s.startsWith(searchKeywords[0]) || s.startsWith(searchKeywords[1])
+					|| s.startsWith(searchKeywords[2]);
+		} else if (searchKeywords.length == 4) {
+			searchFor = s -> s.startsWith(searchKeywords[0]) || s.startsWith(searchKeywords[1])
+					|| s.startsWith(searchKeywords[2]) || s.startsWith(searchKeywords[3]);
+		} */
+		else {
+			matchFor = s ->
+
+			{
+				int i;
+				for (i = 0; i < searchKeywords.length; i++) {
+
+					if (s.startsWith(searchKeywords[i])) {
+						break;
+					}
+				}
+
+				if (i == searchKeywords.length)
+					return false;
+				else
+					return true;
+
+			};
 		}
 		
 		Path path = Paths.get(filePath);
 		
 		Files.lines(path)
-		.filter(searchFor)
-		.map(mapDisplayContent).//{return "Found "+s;}
+		.filter(matchFor)
+		.map(toDisplayContent).//{return "Found "+s;}
 		forEach(System.out::println);		
 		 
 		/*
@@ -349,27 +366,27 @@ class FromJDK_1Dot7 implements FileOperations {
 		try {
 			
 			System.out.println("Nothing to search: [Started]");
-			processFileUsingStreams(SampleFiles.sampleLogFile);
+			doesFileLinesStartWithSearchKeyword(SampleFiles.sampleLogFile);
 			System.out.println("Nothing to search: [Ended]");
 			
 			System.out.println("Searching for 'WARN' statements: [Started]");
-			processFileUsingStreams(SampleFiles.sampleLogFile, "WARN");
+			doesFileLinesStartWithSearchKeyword(SampleFiles.sampleLogFile, "WARN");
 			System.out.println("Searching for 'WARN' statements: [Ended]");
 			
 			System.out.println("Searching for 'ERROR' and 'INFO' statements: [Started]");
-			processFileUsingStreams(SampleFiles.sampleLogFile, "ERROR", "INFO");			
+			doesFileLinesStartWithSearchKeyword(SampleFiles.sampleLogFile, "ERROR", "INFO");			
 			System.out.println("Searching for 'ERROR' and 'INFO' statements: [Ended]");
 			
 			System.out.println("Searching for 'INFO', 'DEBUG', and 'ERROR' statements: [Started]");
-			processFileUsingStreams(SampleFiles.sampleLogFile, "INFO", "DEBUG", "ERROR");			
+			doesFileLinesStartWithSearchKeyword(SampleFiles.sampleLogFile, "INFO", "DEBUG", "ERROR");			
 			System.out.println("Searching for 'INFO', 'DEBUG', and 'ERROR' statements: [Ended]");
 			
 			System.out.println("Searching for 'WARN', 'INFO', 'DEBUG', and 'ERROR' statements: [Started]");
-			processFileUsingStreams(SampleFiles.sampleLogFile, "WARN", "INFO", "DEBUG", "ERROR");			
+			doesFileLinesStartWithSearchKeyword(SampleFiles.sampleLogFile, "WARN", "INFO", "DEBUG", "ERROR");			
 			System.out.println("Searching for 'WARN', 'INFO', 'DEBUG', and 'ERROR' statements: [Ended]");
 			
 			System.out.println("Searching for 'DEBUG' statements: [Started]");
-			processFileUsingStreams(SampleFiles.sampleLogFile, "DEBUG");		
+			doesFileLinesStartWithSearchKeyword(SampleFiles.sampleLogFile, "DEBUG");		
 			System.out.println("Searching for 'DEBUG' statements: [Ended]");			
 			
 		} catch (IOException e) {

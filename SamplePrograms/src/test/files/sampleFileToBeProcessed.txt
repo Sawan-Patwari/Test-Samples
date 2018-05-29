@@ -1,10 +1,14 @@
 INFO 1
 DEBUG 1
 WARN 1
+NoMatch Data 1
 ERROR 1
 WARN 2
 DEBUG 2
+NoMatch Data 2
 WARN 3
 ERROR 2
+NoMatch Data 3
 INFO 2
 ERROR 3
+NoMatch Data 4
