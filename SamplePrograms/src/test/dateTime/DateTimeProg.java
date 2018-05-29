@@ -20,6 +20,7 @@ public class DateTimeProg {
 		manipulationsByDuration();
 		useInstants();
 		DayLightSavingTime.getSample();
+		doEpochSecondsDemo(1);
 	}
 	
 	@SuppressWarnings("unused")
@@ -223,6 +224,15 @@ public class DateTimeProg {
 		}catch(Exception e) {
 			System.out.println(e);
 		}
+	}
+	
+	public static void doEpochSecondsDemo(int daysToBeSubtracted) {
+		long secondsInADay = 86400;
+		long totalSeconds = daysToBeSubtracted * secondsInADay;
+		long epochSecondsUsingInstant = Instant.now().minus(daysToBeSubtracted, ChronoUnit.DAYS).toEpochMilli() / 1000;
+		long epochSecondsUsingSystem = System.currentTimeMillis() / 1000 - totalSeconds;
+		System.out.println(epochSecondsUsingInstant);
+		System.out.println(epochSecondsUsingSystem);
 	}
 	
 	

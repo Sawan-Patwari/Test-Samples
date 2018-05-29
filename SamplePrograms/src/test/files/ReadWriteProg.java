@@ -11,7 +11,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class ReadWriteProg {
 
@@ -28,6 +31,8 @@ public class ReadWriteProg {
 		executeTest8();
 		executeTest9();
 		executeTest10();
+		executeTest11();
+		executeTest12();
 	}
 
 	public static void executeTest1() {
@@ -79,10 +84,23 @@ public class ReadWriteProg {
 	public static void executeTest10() {
 		new FromJDK_1Dot7().doSampleAppendToFileTest();
 	}
+	
+	public static void executeTest11() {
+		FromJDK_1Dot7.listFilesOfCurrentDirectory();
+	}
+	
+	public static void executeTest12() {
+		FromJDK_1Dot7.doDirectoryWalkSample();
+	}
+	
+	public static void executeTest13() {
+		FromJDK_1Dot7.displayLastOneDayModifiedJavaFiles();
+	}
 }
 
 class SampleFiles {
-	private final static String CURRENT_WORKING_DIRECTORY = "." + File.separator + "src" + File.separator + "test"
+	final static String CURRENT_DIRECTORY = ".";
+	private final static String CURRENT_WORKING_DIRECTORY = CURRENT_DIRECTORY + File.separator + "src" + File.separator + "test"
 			+ File.separator + "files" + File.separator;
 
 	final static String filePath1 = CURRENT_WORKING_DIRECTORY + "sampleFile1.txt";
@@ -317,6 +335,86 @@ class FromJDK_1Dot7 implements FileOperations {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Unable to append the content to the file due to " + e);
+		}
+	}
+	
+	public static void listFilesOfADirectory(Path path) {
+		try {
+
+			Files.list(path).filter(p -> 
+				!Files.isDirectory(p)).
+				map(p -> p.toAbsolutePath().
+				normalize()).
+				forEach(System.out::println);
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+	}
+	
+	public static void displayFiles(Path path, String fileType) {
+
+		try {
+			Files.walk(path).filter(p -> p.toString().endsWith(fileType))
+			.forEach(System.out::println);
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+	}
+	
+	public static void displayJavaFiles(Path path) {
+		
+		displayFiles(path, ".java");
+	}
+	
+	public static void listFilesOfCurrentDirectory() {		
+		listFilesOfADirectory(Paths.get(SampleFiles.CURRENT_DIRECTORY));
+	}
+	
+	public static void doDirectoryWalkSample() {
+		displayJavaFiles(Paths.get(SampleFiles.CURRENT_DIRECTORY));
+	}
+	
+	private static Stream<Path> findLastNDaysModifiedFiles(Path path, String fileType, int numberOfDays) {
+		
+		Stream<Path> stream = null;
+		try {
+			stream = Files.find(path, 12,
+
+					(p, a) -> p.toString().endsWith(fileType)
+
+							&& (a.lastModifiedTime().toMillis()) > 
+									(Instant.now().minus(numberOfDays, ChronoUnit.DAYS)
+									.toEpochMilli()));
+
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+		return stream;
+	}
+	
+	public static void displayLastOneDayModifiedJavaFiles() {
+		
+		Stream<Path> streamOfFiles = 
+				findLastNDaysModifiedFiles(
+						Paths.get(SampleFiles.CURRENT_DIRECTORY),".java", 1);
+		
+		if(Objects.isNull(streamOfFiles)) {
+		/*Cannot think of count operation since the stream will be closed.
+		  Need to think of cloning Stream instance, if at all it is possible;
+		  it may not be possible, but need to try later (on the to-do list).
+		  Alternate approach is to get the list out of the stream instance 
+		  and then take a count and as well display the contents, 
+		  if the count is > 0. 
+		  Cloning stream might not be possible because of lambda expressions
+		  (functional programming), and even if it is possible, 
+		  it may be an expensive operation because the stream terminal
+		  operation will be executed twice - one for count and one for 
+		  the forEach operation.
+		*/
+		//if(Objects.isNull(streamOfFiles) || streamOfFiles.count()==0) {
+			System.out.println("Cannot display the files.");
+		}else {
+			streamOfFiles.forEach(System.out::println);
 		}
 	}
 }
