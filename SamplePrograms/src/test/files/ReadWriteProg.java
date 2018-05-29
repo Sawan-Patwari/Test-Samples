@@ -14,6 +14,8 @@ import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class ReadWriteProg {
@@ -96,6 +98,14 @@ public class ReadWriteProg {
 	public static void executeTest13() {
 		FromJDK_1Dot7.displayLastOneDayModifiedJavaFiles();
 	}
+	
+	public static void executeTest14() {
+		FromJDK_1Dot7.doSampleReadWithStreamsTest();
+	}
+	
+	public static void executeTest15() {
+		FromJDK_1Dot7.doSampleFileProcessingUsingStreams();
+	}
 }
 
 class SampleFiles {
@@ -107,6 +117,7 @@ class SampleFiles {
 	final static String filePath2 = CURRENT_WORKING_DIRECTORY + "sampleFile2.txt";
 	final static String filePath3 = CURRENT_WORKING_DIRECTORY + "sampleFile3.txt";
 	final static String emptyFilePath = CURRENT_WORKING_DIRECTORY + "sampleEmptyFile.txt";
+	final static String sampleLogFile = CURRENT_WORKING_DIRECTORY + "sampleFileToBeProcessed.txt";
 }
 
 class BeforeJDK_1Dot7 implements FileOperations {
@@ -288,6 +299,90 @@ class FromJDK_1Dot7 implements FileOperations {
 				System.out.println(currentLine);
 		}
 	}
+	
+	public static void readFileUsingStreams(String filePath) throws IOException{
+		
+		Path path = Paths.get(filePath);
+		Files.lines(path).forEach(System.out::println);
+	}
+	
+	private static void processFileUsingStreams(String filePath, String...searchKeyword) throws IOException{
+				
+		Predicate<String> searchFor = null;
+		Function<String, String> mapDisplayContent = s -> "Found "+s;
+		
+		//if nothing to search then will display the file contents completely.
+		if (searchKeyword.length == 0) {
+			searchFor = s -> true;
+			mapDisplayContent = s -> s;
+		} else if (searchKeyword.length == 1) {
+			searchFor = s -> s.startsWith(searchKeyword[0]);
+		} else if (searchKeyword.length == 2) {
+			searchFor = s -> s.startsWith(searchKeyword[0]) || s.startsWith(searchKeyword[1]);
+		} else if (searchKeyword.length == 3) {
+			searchFor = s -> s.startsWith(searchKeyword[0]) || s.startsWith(searchKeyword[1])
+					|| s.startsWith(searchKeyword[2]);
+		} else if (searchKeyword.length == 4) {
+			searchFor = s -> s.startsWith(searchKeyword[0]) || s.startsWith(searchKeyword[1])
+					|| s.startsWith(searchKeyword[2]) || s.startsWith(searchKeyword[3]);
+		} else {
+			throw new IllegalArgumentException("Can support only 4 search keywords");
+		}
+		
+		Path path = Paths.get(filePath);
+		
+		Files.lines(path)
+		.filter(searchFor)
+		.map(mapDisplayContent).//{return "Found "+s;}
+		forEach(System.out::println);		
+		 
+		/*
+		 List<String> filteredData = Files.lines(path)
+			.filter(s -> s.startsWith("WARN") || s.startsWith("ERROR"))
+			.map(s -> "Found "+s).collect(Collectors.toList());
+		 
+		 */
+	}
+	
+	public static void processSampleLogFile() {
+		
+		try {
+			
+			System.out.println("Nothing to search: [Started]");
+			processFileUsingStreams(SampleFiles.sampleLogFile);
+			System.out.println("Nothing to search: [Ended]");
+			
+			System.out.println("Searching for 'WARN' statements: [Started]");
+			processFileUsingStreams(SampleFiles.sampleLogFile, "WARN");
+			System.out.println("Searching for 'WARN' statements: [Ended]");
+			
+			System.out.println("Searching for 'ERROR' and 'INFO' statements: [Started]");
+			processFileUsingStreams(SampleFiles.sampleLogFile, "ERROR", "INFO");			
+			System.out.println("Searching for 'ERROR' and 'INFO' statements: [Ended]");
+			
+			System.out.println("Searching for 'INFO', 'DEBUG', and 'ERROR' statements: [Started]");
+			processFileUsingStreams(SampleFiles.sampleLogFile, "INFO", "DEBUG", "ERROR");			
+			System.out.println("Searching for 'INFO', 'DEBUG', and 'ERROR' statements: [Ended]");
+			
+			System.out.println("Searching for 'WARN', 'INFO', 'DEBUG', and 'ERROR' statements: [Started]");
+			processFileUsingStreams(SampleFiles.sampleLogFile, "WARN", "INFO", "DEBUG", "ERROR");			
+			System.out.println("Searching for 'WARN', 'INFO', 'DEBUG', and 'ERROR' statements: [Ended]");
+			
+			System.out.println("Searching for 'DEBUG' statements: [Started]");
+			processFileUsingStreams(SampleFiles.sampleLogFile, "DEBUG");		
+			System.out.println("Searching for 'DEBUG' statements: [Ended]");			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+	
+	public static void doSampleFileProcessingUsingStreams() {
+		processSampleLogFile();
+	}
 
 	public void writeFile(String filePath) throws IOException {
 		Path path = Paths.get(filePath);
@@ -311,6 +406,15 @@ class FromJDK_1Dot7 implements FileOperations {
 	public void doSampleReadTest() {
 		try {
 			readFile(SampleFiles.filePath3);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Unable to read to the file due to " + e);
+		}
+	}
+	
+	public static void doSampleReadWithStreamsTest() {
+		try {
+			readFileUsingStreams(SampleFiles.filePath3);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Unable to read to the file due to " + e);
