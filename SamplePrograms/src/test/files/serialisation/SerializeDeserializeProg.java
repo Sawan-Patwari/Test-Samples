@@ -16,6 +16,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 
+ * @author Sawan.Patwari
+ *
+ */
 public class SerializeDeserializeProg {
 
 	public static void main(String[] args) {
@@ -26,6 +31,8 @@ public class SerializeDeserializeProg {
 		tester.serializeDeserializeCatOnlyData();
 		
 		tester.serializeDeserializeAllAnimalData();
+		
+		tester.serializeDeserializeAllAnimalDataList();
 		
 	}
 	
@@ -46,7 +53,17 @@ public class SerializeDeserializeProg {
 		deserializationTester.deseraliseAllAnimalDataFromFile(SampleFiles.allAnimalDataWrittenAtOnceFilePath);
 	}
 	
-	
+	public void serializeDeserializeAllAnimalDataList() {
+		Serialization serializationTester = new Serialization();
+		serializationTester.serialiseListData();
+		
+		Deserialization deserializationTester = new Deserialization();
+		deserializationTester.deserialiseListDataApproach1();
+		deserializationTester.deserialiseListDataApproach2();
+		deserializationTester.deserialiseListDataApproach3();
+		deserializationTester.deserialiseListDataApproach4();
+	}
+		
 	public class Serialization {
 		
 		private void test1(List<Animal> animals, Class<? extends Animal> clazz, Path path)
@@ -146,6 +163,38 @@ public class SerializeDeserializeProg {
 			}*/
 		}
 		
+		private void test4(List<? extends Serializable> objects, Path path) throws FileNotFoundException, IOException {
+
+			if (path == null || path.toFile().isDirectory() || !path.toFile().exists()) {
+				throw new IllegalArgumentException("Cannot Serialize due to issue with the file.");
+			}
+
+			try (FileChannel channel = FileChannel.open(path, StandardOpenOption.WRITE)) {
+
+				//FileLock lock = channel.lock();
+
+				try (ObjectOutputStream writer = new ObjectOutputStream(
+						new BufferedOutputStream(Channels.newOutputStream(channel)))) {					
+						writer.writeObject(objects);
+				}/* finally {
+					lock.release();
+				}*/
+			}
+
+		}
+		
+		public void serialiseListData() {
+			
+			List<Animal> animals = getAllAnimalDataSample();
+			
+			try {
+				test4(animals, Paths.get(SampleFiles.allAnimalListDataFilePath));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		/**
 		 * This method will corrupt the file as per the testing results. The file
 		 * cannot be deserialized later though the serialization (this method call) 
@@ -223,6 +272,19 @@ public class SerializeDeserializeProg {
 		}
 		
 		public void seraliseAllAnimalDataAtOnceToFile() {
+			
+			List<Animal> animals = getAllAnimalDataSample();
+						
+			try {
+				test2(animals, Paths.get(SampleFiles.allAnimalDataWrittenAtOnceFilePath));
+			} catch (IOException | ClassCastException e) {
+				// TODO Auto-generated catch block
+				System.out.println("Couldn't write Elephants data to the file due to " + e);
+			}
+					
+		}
+		
+		private List<Animal> getAllAnimalDataSample() {
 			Torso torsoOfCats = new Torso();
 			torsoOfCats.setTorsoType(TorsoType.SMALL);
 			
@@ -267,13 +329,7 @@ public class SerializeDeserializeProg {
 			animals.add(elephant1);
 			animals.add(elephant2);
 			
-			try {
-				test2(animals, Paths.get(SampleFiles.allAnimalDataWrittenAtOnceFilePath));
-			} catch (IOException | ClassCastException e) {
-				// TODO Auto-generated catch block
-				System.out.println("Couldn't write Elephants data to the file due to " + e);
-			}
-					
+			return animals;
 		}
 		
 		public void seraliseOnlyCatDataToFile() {
@@ -440,6 +496,186 @@ public class SerializeDeserializeProg {
 			
 			return animals;
 		}
+		
+		private List<Animal> test3(Path path, Class<List<Animal>> clazz)		
+				throws FileNotFoundException, IOException, ClassCastException, ClassNotFoundException {
+
+			if (path == null || path.toFile().isDirectory() || !path.toFile().exists()) {
+				throw new IllegalArgumentException("Cannot Serialize due to issue with the file.");
+			}
+			
+			List<Animal> listData = new ArrayList<>();
+			Object object;
+			try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
+				
+				//FileLock lock = channel.lock();
+				
+				try (ObjectInputStream reader = new ObjectInputStream(Channels.newInputStream(channel))) {
+					
+						object = reader.readObject();
+						if(object != null) {
+							listData = clazz.cast(object);
+						}
+					
+				}
+				/*finally {
+					
+					lock.release();				
+				} */
+			}
+			
+			return listData;
+		}
+		
+		private List<Serializable> test4(Path path, Class<List<Serializable>> clazz)		
+				throws FileNotFoundException, IOException, ClassCastException, ClassNotFoundException {
+
+			if (path == null || path.toFile().isDirectory() || !path.toFile().exists()) {
+				throw new IllegalArgumentException("Cannot Serialize due to issue with the file.");
+			}
+			
+			List<Serializable> listData = new ArrayList<>();
+			Object object;
+			try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
+				
+				//FileLock lock = channel.lock();
+				
+				try (ObjectInputStream reader = new ObjectInputStream(Channels.newInputStream(channel))) {
+					
+						object = reader.readObject();
+						if(object != null) {
+							listData = clazz.cast(object);
+						}
+					
+				}
+				/*finally {
+					
+					lock.release();				
+				} */
+			}
+			
+			return listData;
+		}
+				
+		private List<? extends Serializable> test5(Path path, Class<List<? extends Serializable>> clazz)		
+				throws FileNotFoundException, IOException, ClassCastException, ClassNotFoundException {
+
+			if (path == null || path.toFile().isDirectory() || !path.toFile().exists()) {
+				throw new IllegalArgumentException("Cannot Serialize due to issue with the file.");
+			}
+			
+			List<? extends Serializable> listData = new ArrayList<>();
+			Object object;
+			try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
+				
+				//FileLock lock = channel.lock();
+				
+				try (ObjectInputStream reader = new ObjectInputStream(Channels.newInputStream(channel))) {
+					
+						object = reader.readObject();
+						if(object != null) {
+							listData = clazz.cast(object);
+						}
+					
+				}
+				/*finally {
+					
+					lock.release();				
+				} */
+			}
+			
+			return listData;
+		}
+					
+		@SuppressWarnings("unchecked")
+		public void deserialiseListDataApproach1() {
+					
+			List<? extends Serializable> animalsData = new ArrayList<>();
+						
+			try {
+				animalsData = (List<? extends Serializable>)test5(Paths.get(SampleFiles.allAnimalListDataFilePath), (Class<List<? extends Serializable>>) animalsData.getClass());
+				animalsData.forEach(System.out::println);
+				
+				/*
+				  We can code below lines if we are sure that 'animalsData' is castable
+				  to (List<Animal>). In our case, the file (SampleFiles.allAnimalListDataFilePath) 
+				  has List<Animal> data only.
+				 */
+				/*
+				for(Animal animal : (List<Animal>) animalsData) {
+					System.out.println(animal.getUniqueName());
+				}
+				*/		
+			} catch (ClassCastException | ClassNotFoundException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+					
+		}
+		
+		@SuppressWarnings("unchecked")
+		public void deserialiseListDataApproach2() {
+			
+			List<Animal> animalsData = new ArrayList<>();
+			
+			try {
+				animalsData = (List<Animal>)test5(Paths.get(SampleFiles.allAnimalListDataFilePath), (Class<List<? extends Serializable>>) animalsData.getClass());
+				animalsData.forEach(System.out::println);
+				
+				for(Animal animal : (List<Animal>) animalsData) {
+					System.out.println(animal.getUniqueName());
+				}
+								
+			} catch (ClassCastException | ClassNotFoundException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		
+		@SuppressWarnings("unchecked")
+		public void deserialiseListDataApproach3() {
+			
+			List<Animal> animalsData = new ArrayList<>();
+			
+			try {
+				animalsData = (List<Animal>)test3(Paths.get(SampleFiles.allAnimalListDataFilePath), (Class<List<Animal>>) animalsData.getClass());
+				animalsData.forEach(System.out::println);
+				
+				for(Animal animal : animalsData) {
+					System.out.println(animal.getUniqueName());
+				}
+								
+			} catch (ClassCastException | ClassNotFoundException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		
+		@SuppressWarnings("unchecked")
+		public void deserialiseListDataApproach4() {
+			
+			List<Serializable> animalsData = new ArrayList<>();
+			
+			try {
+				animalsData = (List<Serializable>)test4(Paths.get(SampleFiles.allAnimalListDataFilePath), (Class<List<Serializable>>) animalsData.getClass());
+				animalsData.forEach(System.out::println);
+				
+				for(Serializable animal : animalsData) {
+					/*
+					 * Below casting can be done if the file has only Animal 
+					 * serialized data.
+					 */
+					System.out.println(((Animal)animal).getUniqueName());
+				}
+								
+			} catch (ClassCastException | ClassNotFoundException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
 				
 		@SuppressWarnings("unchecked")
 		public void deseraliseAllAnimalDataFromFile(String filePath) {
@@ -483,6 +719,7 @@ class SampleFiles {
 	final static String catOnlyDataFilePath = CURRENT_WORKING_DIRECTORY + "catOnlyFile.data";
 	final static String dogOnlyDataFilePath = CURRENT_WORKING_DIRECTORY + "dogOnlyFile.data";
 	final static String elephantOnlyDataFilePath = CURRENT_WORKING_DIRECTORY + "elephantOnlyFile.data";
+	final static String allAnimalListDataFilePath = CURRENT_WORKING_DIRECTORY + "AllAnimalListDataFile.data";
 }
 
 class Animal implements Serializable{
