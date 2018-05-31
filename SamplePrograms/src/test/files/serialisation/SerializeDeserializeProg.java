@@ -62,6 +62,7 @@ public class SerializeDeserializeProg {
 		deserializationTester.deserialiseListDataApproach2();
 		deserializationTester.deserialiseListDataApproach3();
 		deserializationTester.deserialiseListDataApproach4();
+		deserializationTester.deserialiseListDataApproach5();
 	}
 		
 	public class Serialization {
@@ -527,7 +528,37 @@ public class SerializeDeserializeProg {
 			return listData;
 		}
 		
-		private List<Serializable> test4(Path path, Class<List<Serializable>> clazz)		
+		private List<? extends Animal> test4(Path path, Class<List<? extends Animal>> clazz)		
+				throws FileNotFoundException, IOException, ClassCastException, ClassNotFoundException {
+
+			if (path == null || path.toFile().isDirectory() || !path.toFile().exists()) {
+				throw new IllegalArgumentException("Cannot Serialize due to issue with the file.");
+			}
+			
+			List<? extends Animal> listData = new ArrayList<>();
+			Object object;
+			try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
+				
+				//FileLock lock = channel.lock();
+				
+				try (ObjectInputStream reader = new ObjectInputStream(Channels.newInputStream(channel))) {
+					
+						object = reader.readObject();
+						if(object != null) {
+							listData = clazz.cast(object);
+						}
+					
+				}
+				/*finally {
+					
+					lock.release();				
+				} */
+			}
+			
+			return listData;
+		}
+		
+		private List<Serializable> test5(Path path, Class<List<Serializable>> clazz)		
 				throws FileNotFoundException, IOException, ClassCastException, ClassNotFoundException {
 
 			if (path == null || path.toFile().isDirectory() || !path.toFile().exists()) {
@@ -557,7 +588,7 @@ public class SerializeDeserializeProg {
 			return listData;
 		}
 				
-		private List<? extends Serializable> test5(Path path, Class<List<? extends Serializable>> clazz)		
+		private List<? extends Serializable> test6(Path path, Class<List<? extends Serializable>> clazz)		
 				throws FileNotFoundException, IOException, ClassCastException, ClassNotFoundException {
 
 			if (path == null || path.toFile().isDirectory() || !path.toFile().exists()) {
@@ -593,7 +624,7 @@ public class SerializeDeserializeProg {
 			List<? extends Serializable> animalsData = new ArrayList<>();
 						
 			try {
-				animalsData = (List<? extends Serializable>)test5(Paths.get(SampleFiles.allAnimalListDataFilePath), (Class<List<? extends Serializable>>) animalsData.getClass());
+				animalsData = (List<? extends Serializable>)test6(Paths.get(SampleFiles.allAnimalListDataFilePath), (Class<List<? extends Serializable>>) animalsData.getClass());
 				animalsData.forEach(System.out::println);
 				
 				/*
@@ -619,7 +650,7 @@ public class SerializeDeserializeProg {
 			List<Animal> animalsData = new ArrayList<>();
 			
 			try {
-				animalsData = (List<Animal>)test5(Paths.get(SampleFiles.allAnimalListDataFilePath), (Class<List<? extends Serializable>>) animalsData.getClass());
+				animalsData = (List<Animal>)test6(Paths.get(SampleFiles.allAnimalListDataFilePath), (Class<List<? extends Serializable>>) animalsData.getClass());
 				animalsData.forEach(System.out::println);
 				
 				for(Animal animal : (List<Animal>) animalsData) {
@@ -656,10 +687,30 @@ public class SerializeDeserializeProg {
 		@SuppressWarnings("unchecked")
 		public void deserialiseListDataApproach4() {
 			
+			List<? extends Animal> animalsData = new ArrayList<>();
+			
+			try {
+				animalsData = (List<? extends Animal>)test4(Paths.get(SampleFiles.allAnimalListDataFilePath), (Class<List<? extends Animal>>) animalsData.getClass());
+				animalsData.forEach(System.out::println);
+				
+				for(Animal animal : animalsData) {
+					System.out.println(animal.getUniqueName());
+				}
+								
+			} catch (ClassCastException | ClassNotFoundException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		
+		@SuppressWarnings("unchecked")
+		public void deserialiseListDataApproach5() {
+			
 			List<Serializable> animalsData = new ArrayList<>();
 			
 			try {
-				animalsData = (List<Serializable>)test4(Paths.get(SampleFiles.allAnimalListDataFilePath), (Class<List<Serializable>>) animalsData.getClass());
+				animalsData = (List<Serializable>)test5(Paths.get(SampleFiles.allAnimalListDataFilePath), (Class<List<Serializable>>) animalsData.getClass());
 				animalsData.forEach(System.out::println);
 				
 				for(Serializable animal : animalsData) {
