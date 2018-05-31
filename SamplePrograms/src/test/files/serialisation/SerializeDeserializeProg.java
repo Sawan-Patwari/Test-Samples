@@ -936,28 +936,28 @@ enum TorsoType implements Serializable {
 }
 
 class Torso implements Serializable {
-	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	String classType = "Torso"; 
+	String classType = "Torso";
 	TorsoType torsoType;
 	static int thisStaticInfoWillNotBeStoredToFile = 100;
 	transient int thisTransientInfoWillNotBeStoredToFile = 200;
-	
+
 	public TorsoType getTorsoType() {
 		return torsoType;
 	}
-	
+
 	public void setTorsoType(TorsoType torsoType) {
 		this.torsoType = torsoType;
-	}	
-	
+	}
+
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return "classType: "+classType + " "+"torsoType:" +torsoType + " ";
+		return "classType: " + classType + " " + "torsoType:" + torsoType + " ";
 	}
 }
 
@@ -967,20 +967,21 @@ class Tail implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	String classType = "Tail"; 
+
+	String classType = "Tail";
 	boolean isTailPresent;
-	
+
 	public boolean isTailPresent() {
 		return isTailPresent;
 	}
+
 	public void setTailPresent(boolean isTailPresent) {
 		this.isTailPresent = isTailPresent;
 	}
-	
+
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return "classType: "+classType + " "+"isTailPresent:" +isTailPresent;
+		return "classType: " + classType + " " + "isTailPresent:" + isTailPresent;
 	}
 }
