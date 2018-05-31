@@ -1,6 +1,9 @@
 package favouritePackage;
 
 /**
+ * Wanted to have a copy of the class - 'test.files.serialisation.SerializeDeserializeProg' 
+ * as one of the favorite classes of mine.
+ * 
  * 
  * @author Sawan.Patwari
  *
