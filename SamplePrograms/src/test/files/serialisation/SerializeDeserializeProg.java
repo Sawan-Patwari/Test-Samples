@@ -893,7 +893,7 @@ class Elephant extends Animal {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	String elephantProperty = " I am a Elephant ";
+	String elephantProperty = " I am an Elephant ";
 	
 	Torso torso;
 	
