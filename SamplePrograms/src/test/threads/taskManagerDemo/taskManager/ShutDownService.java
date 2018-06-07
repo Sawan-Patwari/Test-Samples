@@ -1,7 +1,12 @@
 package test.threads.taskManagerDemo.taskManager;
 
 import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * 
@@ -12,10 +17,18 @@ abstract public class ShutDownService<T>{
 
 	private T service;
 	private Long waitTimeInMinutes;
+	private List<Future<?>> futureOfSubmittedTasks = new ArrayList<>();
 	
 	public ShutDownService(T service, Long waitTimeInMinutes) {
 		this.service = service;
 		this.waitTimeInMinutes = waitTimeInMinutes;
+	}
+	
+	public ShutDownService(T service, List<Future<?>> futureOfSubmittedTasks) {
+		this.service = service;
+		if(!Objects.isNull(futureOfSubmittedTasks)) {
+			this.futureOfSubmittedTasks = futureOfSubmittedTasks;
+		}
 	}
 	
 	protected void doShutDownService() {
@@ -38,6 +51,39 @@ abstract public class ShutDownService<T>{
 		} else {
 			throw new UnsupportedOperationException("Service Shutdown operation not supported.");
 		}
+	}
+	
+	protected void doShutDownServiceIfTasksCompleted(ScheduledExecutorService serviceShutdowner) {
+		
+		boolean canShutdown = true;
+		
+		for(Future<?> x : getFutureOfSubmittedTasks()) {
+			
+			if(!x.isDone()) {
+				
+				canShutdown = false;
+				break;
+			}
+		}
+
+		if(canShutdown) {
+			if(service instanceof ExecutorService) {
+				if (service != null)
+					((ExecutorService)service).shutdown();
+			} else {
+				throw new UnsupportedOperationException("Service Shutdown operation not supported.");
+			}
+			
+			if(serviceShutdowner != null) {
+				serviceShutdowner.shutdown();
+			}
+			
+			System.out.println("Services have been shut-down.");
+		}
+	}
+
+	private List<Future<?>> getFutureOfSubmittedTasks() {
+		return futureOfSubmittedTasks;
 	}
 
 }

@@ -24,7 +24,7 @@ public class SingletonPatternProg {
 		// TODO Auto-generated method stub
 		StorageAreaManager storageAreaManager = new StorageAreaManager();
 		storageAreaManager.setWorkingSeconds(30);//working time in seconds.
-		storageAreaManager.setNumberOfWorkers(5);//number of subordinates.
+		storageAreaManager.setNumberOfWorkers(3);//number of subordinates.
 		storageAreaManager.doManage();
 		
 		System.out.println("Main will shutdown now.");
@@ -178,21 +178,21 @@ class StorageAreaManager {
 
 	public void doManage() {
 
-		ScheduledExecutorService scheduledService = Executors.newSingleThreadScheduledExecutor();
+		ScheduledExecutorService managerService = Executors.newSingleThreadScheduledExecutor();
 		ExecutorService coreManagementService = Executors.newFixedThreadPool(getNumberOfWorkers());
 
 		Runnable coreManagementTask = () -> {
 			doCoreManagement(coreManagementService);
 		};
 
-		ScheduledFuture<?> scheduledServiceFuture = scheduledService.scheduleAtFixedRate(coreManagementTask, 0, 1,
+		ScheduledFuture<?> scheduledServiceFuture = managerService.scheduleAtFixedRate(coreManagementTask, 0, 1,
 				TimeUnit.SECONDS);
 
 		Runnable shutdownScheduledServiceTask = () -> {
-			shutDownScheduledService(scheduledServiceFuture, scheduledService);
+			shutDownScheduledService(scheduledServiceFuture, managerService);
 		};
 
-		scheduledService.scheduleAtFixedRate(shutdownScheduledServiceTask, getWorkingSeconds(), 1, TimeUnit.SECONDS);
+		managerService.schedule(shutdownScheduledServiceTask, getWorkingSeconds(), TimeUnit.SECONDS);
 
 		ScheduledExecutorService coreManagementServiceShutdowner = Executors.newSingleThreadScheduledExecutor();
 
@@ -200,7 +200,9 @@ class StorageAreaManager {
 			shutDownCoreManagementService(coreManagementServiceShutdowner, coreManagementService);
 		};
 
-		coreManagementServiceShutdowner.scheduleAtFixedRate(shutDownCoreManagementServiceTask, getWorkingSeconds(), 1, TimeUnit.SECONDS);
+		//intentionally, reducing the the second parameter value by 20 to make use of read-write lock code
+		//between 'managerService' and 'coreManagementServiceShutdowner'.
+		coreManagementServiceShutdowner.scheduleAtFixedRate(shutDownCoreManagementServiceTask, getWorkingSeconds()-20, 1, TimeUnit.SECONDS);
 
 	}
 	
@@ -208,15 +210,33 @@ class StorageAreaManager {
 		
 		Runnable task1 = () -> {
 			StorageArea.getInstance().getRiceItem().increaseQuantity(1000);
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		};
 		
 		Runnable task2 = () -> {
 			StorageArea.getInstance().getRiceItem().decreaseQuantity(100);
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		};
 		
 		Runnable task3 = () -> {
-			System.out.println(StorageArea.getInstance().getRiceItem());
 			
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println(StorageArea.getInstance().getRiceItem());
 		};
 		
 		Future<?> futureOfTask1 = coreManagementService.submit(task1);
@@ -233,14 +253,15 @@ class StorageAreaManager {
 	
 	private void shutDownScheduledService(ScheduledFuture<?> scheduledServiceFuture, ScheduledExecutorService scheduledService) {
 		
-		if(scheduledServiceFuture.isDone()) {
+		//if(scheduledServiceFuture.isDone()) {
 			scheduledService.shutdown();
-		}
+			System.out.println("managerService is shutting down.");
+		//}
 	}
 	
 	private void shutDownCoreManagementService(ScheduledExecutorService coreManagementServiceShutdowner, ExecutorService coreManagementService) {
 				
-		boolean shutdown = true;
+		boolean canShutdown = true;
 		Lock lock = locker.readLock();
 		lock.lock();
 		
@@ -248,22 +269,15 @@ class StorageAreaManager {
 			
 			if(!x.isDone()) {
 				
-				shutdown = false;
+				canShutdown = false;
 				break;
 			}
 		}
 
 		lock.unlock();
 		
-		if(shutdown) {
-			coreManagementService.shutdown();
-			try {
-				coreManagementService.awaitTermination(2, TimeUnit.MINUTES);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				System.out.println("Unable to Terminate Core Management Service");
-			}
-			
+		if(canShutdown) {
+			coreManagementService.shutdown();			
 			coreManagementServiceShutdowner.shutdown();
 		}
 	}
