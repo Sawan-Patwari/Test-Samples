@@ -2,6 +2,11 @@ package general;
 
 import java.util.Objects;
 
+/**
+ * 
+ * @author Sawan.Patwari
+ *
+ */
 public class EnumProg {
 
 	public static void main(String[] args) {
