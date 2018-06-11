@@ -72,6 +72,7 @@ public class StreamsProg {
 		printStreamDiffWays3();
 		streamIntPrimitives();
 		optionalWithPrimitiveStreams();
+		displayFirstNOddNumbers(100);
 		rangeCalculation();
 		deferredExecution();
 		streamsWithOptionals();
@@ -491,6 +492,14 @@ public class StreamsProg {
 		System.out.println(ints);// Eclipse not providing interface implementer classes list.
 		ints.forEach(System.out::println);
 
+	}
+	
+	public static void displayFirstNOddNumbers(int n) {
+		Stream<Integer> infinite = Stream.iterate(1, x -> x + 1);
+		infinite.filter(x -> x % 2 == 1)
+		//.peek(System.out::print)
+		.limit(n)
+		.forEach(System.out::println);
 	}
 
 	public static void optionalWithPrimitiveStreams() {
