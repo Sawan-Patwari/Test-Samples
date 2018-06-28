@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.SpringRestSample1.domain.SampleDomain;
-import com.example.SpringRestSample1.exceptions.SampleException;
+import com.example.SpringRestSample1.exceptions.SampleServerException;
+import com.example.SpringRestSample1.exceptions.SampleServerException1;
 
 /**
  * 
@@ -29,7 +30,7 @@ public class SampleController {
 		if (value.equals("1")) {
 			return sampleDomain;
 		} else {
-			SampleException sampleException = new SampleException("Throwing Exception Explicitly");
+			SampleServerException sampleException = new SampleServerException("Throwing Exception Explicitly");
 			sampleException.setExceptionName("FirstException");
 
 			throw sampleException;
@@ -37,10 +38,22 @@ public class SampleController {
 
 	}
 
+	//Test Method: SampleClient.test3()
 	@GetMapping("/throwException1")
 	public SampleDomain throwException1() {
 
-		SampleException sampleException = new SampleException("Throwing Exception Explicitly");
+		SampleServerException sampleException = new SampleServerException("Throwing Exception Explicitly from server.");
+		sampleException.setExceptionName("SecondException");
+
+		throw sampleException;
+
+	}
+
+	//Test Method: SampleClient.test4()
+	@GetMapping("/throwException2")
+	public SampleDomain throwException2() {
+
+		SampleServerException1 sampleException = new SampleServerException1("SecondException: from throwException2() ");
 		sampleException.setExceptionName("SecondException");
 
 		throw sampleException;

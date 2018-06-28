@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 
 import com.example.SpringRestSample1.domain.SampleDomain;
-import com.example.SpringRestSample1.exceptions.SampleException;
+
+
+import clients.exceptions.SampleClientException;
 
 /**
  * 
@@ -31,6 +33,7 @@ public class SampleClient {
 		// test1();
 		//test2();
 		test3();
+		//test4();
 	}
 
 	public static void test1() {
@@ -43,7 +46,7 @@ public class SampleClient {
 
 			SampleDomain sampleDomain = response.getBody();
 			System.out.println(ToStringBuilder.reflectionToString(sampleDomain));
-		} catch (SampleException ex) {
+		} catch (SampleClientException ex) {
 			System.out.println(ex);
 		} catch (Exception ex) {
 			System.out.println(ex);
@@ -55,7 +58,7 @@ public class SampleClient {
 		if (Objects.isNull(template)) {
 			template = new RestTemplate();
 			Map<HttpStatus, Class<? extends RestClientException>> statusMapping = new HashMap<>();
-			statusMapping.put(HttpStatus.BAD_REQUEST, SampleException.class);
+			statusMapping.put(HttpStatus.BAD_REQUEST, SampleClientException.class);
 
 			List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
 			messageConverters.addAll(template.getMessageConverters());
@@ -81,17 +84,13 @@ public class SampleClient {
 			ResponseEntity<?> response = template.getForEntity("http://localhost:8080/sayHello/testException/{value}",
 					SampleDomain.class, "2");
 
-		} catch (SampleException ex) {
+		} catch (SampleClientException ex) {
 			System.out.println("SampleException:" + ex);
 		} catch (Exception ex) {
 			System.out.println("Exception:" + ex);
 		}
 	}
-
-	/**
-	 * This is not working as expected as there is no exception (SampleException)
-	 * throw.
-	 */
+	
 	@SuppressWarnings("unused")
 	public static void test3() {
 		try {
@@ -100,7 +99,22 @@ public class SampleClient {
 			ResponseEntity<?> response = template.getForEntity("http://localhost:8080/sayHello/throwException1",
 					SampleDomain.class);
 
-		} catch (SampleException ex) {
+		} catch (SampleClientException ex) {
+			System.out.println("SampleException:" + ex);
+		} catch (Exception ex) {
+			System.out.println("Exception:" + ex);
+		}
+	}
+	
+	@SuppressWarnings("unused")
+	public static void test4() {
+		try {
+			prepareTemplate();
+
+			ResponseEntity<?> response = template.getForEntity("http://localhost:8080/sayHello/throwException2",
+					SampleDomain.class);
+
+		} catch (SampleClientException ex) {
 			System.out.println("SampleException:" + ex);
 		} catch (Exception ex) {
 			System.out.println("Exception:" + ex);

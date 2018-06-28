@@ -1,24 +1,23 @@
 package com.example.SpringRestSample1.exceptions;
 
-import org.springframework.web.client.RestClientException;
 
 /**
  * 
  * @author Sawan.Patwari
  *
  */
-public class SampleException extends RestClientException{
+public class SampleServerException extends RuntimeException{
 
-	public SampleException(String msg) {
+	public SampleServerException(String msg) {
 		super(msg);
 		// TODO Auto-generated constructor stub
 	}
 	
-	public SampleException(String message, Throwable cause) {
+	public SampleServerException(String message, Throwable cause) {
 		super(message, cause);
 	}
 	
-	public SampleException() {
+	public SampleServerException() {
 		super("A Sample Exception");
 		// TODO Auto-generated constructor stub
 	}
