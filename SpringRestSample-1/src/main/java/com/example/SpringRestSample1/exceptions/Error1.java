@@ -20,7 +20,5 @@ public class Error1 {
 	//changing the variable name to something else will result in not 
 	//using this value at the Java Spring Rest client.
 	public String message;
-	
-	//This will not be used on the Java Spring Rest client.
-	//public String standardMessage = "This is an error from Server";
+
 }

@@ -58,13 +58,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	//Test Method: SampleClient.test4()
-	@ExceptionHandler({ SampleServerException1.class })
-	public ResponseEntity<? extends Object> handleMyCustomBadRequest1(Exception ex, WebRequest request) {
+	@ExceptionHandler({ SampleServerException1.class })//Other exceptions can be mapped using comma-separator.
+	public ResponseEntity<? extends Object> handleMyCustomBadRequest1(SampleServerException1 ex, WebRequest request) {
+	//public ResponseEntity<? extends Object> handleMyCustomBadRequest1(Exception ex, WebRequest request) {
 		
 		Error1 error = new Error1();
 		error.message1 = ex.getLocalizedMessage() + "Second Message Exception test-2";//This is not accessible on the Java Spring Rest client.
 		error.message = ex.getLocalizedMessage() + "Exception test-2";
-		
+		//ResponseEntity has to have a non-empty body else an exception on Java Spring Rest client 
+		//will not be thrown by the methods of the RestTemplate class as per RestTemplate code base.
 		return handleExceptionInternal(ex, error, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
 

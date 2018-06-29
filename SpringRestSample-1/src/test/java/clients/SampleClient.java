@@ -32,8 +32,8 @@ public class SampleClient {
 		// TODO Auto-generated method stub
 		// test1();
 		//test2();
-		test3();
-		//test4();
+		//test3();
+		test4();
 	}
 
 	public static void test1() {
@@ -57,8 +57,15 @@ public class SampleClient {
 
 		if (Objects.isNull(template)) {
 			template = new RestTemplate();
+			//********[Start]
 			Map<HttpStatus, Class<? extends RestClientException>> statusMapping = new HashMap<>();
+			//Can think of using HttpStatus.Series (by using ExtractingResponseErrorHandler.setSeriesMapping) 
+			//for mapping HttpStatus.Series error codes pertaining to client and server exceptions 
+			//separately in a series manner instead of mapping for each of the HttpStatus codes, explicitly,
+			//otherwise there will be many statusMapping.put lines of code as the below code-line.
+			//Check the java doc of ExtractingResponseErrorHandler.
 			statusMapping.put(HttpStatus.BAD_REQUEST, SampleClientException.class);
+			//********[End]
 
 			List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
 			messageConverters.addAll(template.getMessageConverters());
