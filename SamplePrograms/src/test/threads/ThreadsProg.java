@@ -26,6 +26,15 @@ public class ThreadsProg extends Thread implements Runnable {
 		doBasicTest(args);
 
 		// Look at the overridden run() method for other samples on Threads.
+		
+		Thread t1 = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				System.out.println("Running from Run");
+			}
+		});
+
+		t1.start();
 	}
 
 	@Override

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * 
@@ -64,6 +66,24 @@ public class ComparisonProg {
 		System.out.println("Sorting Persons (Descending Names): [End]");
 		System.out.println();
 		
+		System.out.println();
+		System.out.println("Sorting Persons (All Fields): [Start]");
+				
+		sortedSetTest();
+
+		System.out.println("Sorting Persons (All Fields): [End]");
+		System.out.println();
+		
+	}
+	
+	private static void sortedSetTest() {
+		SortedSet<Person> sortedSetPersons = new TreeSet<>();
+		
+		for(Person person: getPersons()) {
+			sortedSetPersons.add(person);
+		}
+		
+		sortedSetPersons.forEach(p -> {System.out.println(p.toString());});
 	}
 	
 	private static void sortAndDisplay(List<Person> persons, Comparator<Person> comparator) {
@@ -238,5 +258,18 @@ class Person implements Comparable<Person>{
 	public String toString() {
 		// TODO Auto-generated method stub
 		return "Person Name:"+getName()+"\t"+"Person Birthday:"+getBirthday();
+	}
+		
+	@Override
+	public boolean equals(Object otherPerson) {
+		// TODO Auto-generated method stub
+		
+		int value = this.compareTo((Person)otherPerson);
+		
+		if(value == 0) {
+			return true;
+		} else {
+			return false;
+		}		
 	}
 }

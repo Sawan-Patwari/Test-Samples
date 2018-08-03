@@ -15,6 +15,7 @@ public class Programs {
 		// TODO Auto-generated method stub
 		ToStringSample._do();
 		EqualsBuilderSample._do();
+		Math.doTest1();
 	}
 
 }
@@ -114,6 +115,17 @@ class SomeJunkTest {
 
 	interface z extends x {
 		
+	}
+}
+
+class Math{
+	
+	public static void doTest1() {
+		int m = 4;
+		double n = 4.34;
+		
+		if(m==n) System.out.println("Equal");
+		else System.out.println("Not Equal");
 	}
 }
 
