@@ -1,5 +1,8 @@
 package general;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.HashCodeExclude;
@@ -18,6 +21,7 @@ public class HashCodeProg {
 		Base1Level1a.test2();
 		Base1Level1a.test3();
 		Base1Level1a.test4();
+		Employee.test();
 	}
 
 }
@@ -182,3 +186,38 @@ class Base1Level1a extends Base1 {
 		System.out.println("test4: [Ended]");
 	}
 }
+
+class Employee {
+	int a;
+	int b;
+	
+	/*
+	@Override
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
+	} */
+	
+	static void test() {
+		Employee x = new Employee();
+		x.a = 10;
+		x.b = 20;
+		
+		Employee x1 = new Employee();
+		x1.a = 10;
+		x1.b = 20;
+		
+		Map<Integer, Employee> map = new HashMap<>();
+		
+		map.put(1, x);
+		map.put(1, x1);
+		System.out.println(map.size());
+		
+		System.out.println("Hash Codes of x:"+x.hashCode());
+		System.out.println("Hash Codes of x1:"+x1.hashCode());
+		
+		Employee z = x;
+		System.out.println("Hash Codes of z:"+z.hashCode());
+		
+	}
+}
+

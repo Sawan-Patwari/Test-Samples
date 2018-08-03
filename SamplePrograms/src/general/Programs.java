@@ -101,3 +101,19 @@ class EqualsBuilderSample {
 	
 }
 
+class SomeJunkTest {
+	interface x {
+		interface y{
+			
+		}
+		
+		class t {
+			
+		}
+	}
+
+	interface z extends x {
+		
+	}
+}
+
