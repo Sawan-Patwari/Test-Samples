@@ -19,7 +19,7 @@ public class HashMapProg {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		test2();
+		test7();
 	}
 
 	public static void test1() {
@@ -182,6 +182,24 @@ public class HashMapProg {
 			System.out.println(m.a + " " +n.b);
 		});
 		
+	}
+	
+	public static void test7() {
+		Map<Employee4, Employee4> map = new HashMap<>();
+		map.put(null, null);
+		map.put(null, null);
+		map.put(null, null);
+		map.put(null, null);
+		
+		System.out.println(map.size());
+	}
+	
+	public static void test8() {
+		//Compilation error.	
+		//Map<int, int> map = new HashMap<>();
+		
+		
+		//System.out.println(map.size());
 	}
 
 	class Employee {
