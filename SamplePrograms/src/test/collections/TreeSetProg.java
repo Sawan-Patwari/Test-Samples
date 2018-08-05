@@ -17,10 +17,15 @@ public class TreeSetProg {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		test1_fix();
+		test1();
 	}
 
-	// Set sample
+	/*
+	 * Exception in thread "main" java.lang.ClassCastException:
+	 * test.collections.TreeSetProg$Employee cannot be cast to
+	 * java.base/java.lang.Comparable at java.base/java.util.TreeMap.compare(Unknown
+	 * Source)
+	 */
 	public static void test1() {
 		Employee x = sample.new Employee();
 		x.a = 10;
