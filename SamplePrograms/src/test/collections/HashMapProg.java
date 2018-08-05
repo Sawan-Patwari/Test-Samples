@@ -19,7 +19,7 @@ public class HashMapProg {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		test6();
+		test2();
 	}
 
 	public static void test1() {
@@ -63,10 +63,16 @@ public class HashMapProg {
 		Employee x1 = sample.new Employee();
 		x1.a = 10;
 		x1.b = 20;
+		
+		Employee x2 = sample.new Employee();
+		x2.a = 10;
+		x2.b = 20;
 
 		Map<Employee, Employee> map = new HashMap<>();
 		map.put(x, x);
 		map.put(x1, x1);
+		map.put(x1, x1);
+		map.put(x2, x2);
 		System.out.println(map.size());
 
 	}
