@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * 
@@ -102,25 +103,26 @@ public class TreeSetProg {
 			} else {
 
 				// Simple code:
-				return EqualsBuilder.reflectionEquals(this, other);
+				// return EqualsBuilder.reflectionEquals(this, other);
 
 				// For the better performance of the equal's method.
-				/*
-				 * if (this.hashCode() == other.hashCode()) { 
-				 * 	return EqualsBuilder.reflectionEquals(this, other); 
-				 * } else { return false; }
-				 */
+				if (this.hashCode() == other.hashCode()) {
+					return EqualsBuilder.reflectionEquals(this, other);
+				} else {
+					return false;
+				}
+
 			}
 
 		}
 
 		// Not necessary to implement, unlike in the case of HashMap, however, it is
-		// better for
-		// the better performance of the equal's method only.
-		/*
-		 * @Override public int hashCode() { return
-		 * HashCodeBuilder.reflectionHashCode(this); }
-		 */
+		// better for the better performance of the equal's method only.
+		@Override
+		public int hashCode() {
+			return HashCodeBuilder.reflectionHashCode(this);
+		}
+
 	}
 
 }
