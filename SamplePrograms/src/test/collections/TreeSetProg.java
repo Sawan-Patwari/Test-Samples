@@ -17,7 +17,7 @@ public class TreeSetProg {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		test1();
+		test2();
 	}
 
 	/*
@@ -68,6 +68,30 @@ public class TreeSetProg {
 		setSample.add(x);
 		setSample.add(x1);
 		System.out.println(setSample.size());
+
+	}
+	
+	//Made the TreeSet to contain duplicate elements; duplicate elements as per our terminology.
+	public static void test2() {
+		Employee_Fix_1 x = sample.new Employee_Fix_1();
+		x.a = 10;
+		x.b = 20;
+
+		Employee_Fix_1 x1 = sample.new Employee_Fix_1();
+		x1.a = 10;
+		x1.b = 20;
+		
+		Employee_Fix_1 x2 = sample.new Employee_Fix_1();
+		x2.a = 10;
+		x2.b = 20;
+
+		Set<Employee_Fix_1> setSample = new TreeSet<>();
+		setSample.add(x);
+		setSample.add(x1);
+		setSample.add(x2);
+		System.out.println(setSample.size());
+		
+		setSample.forEach((m) -> {System.out.println(m.a + " " + m.b);});
 
 	}
 
@@ -128,6 +152,19 @@ public class TreeSetProg {
 			return HashCodeBuilder.reflectionHashCode(this);
 		}
 
+	}
+
+	class Employee_Fix_1 implements Comparable<Employee_Fix_1> {
+		int a;
+		int b;
+
+		@Override
+		public int compareTo(Employee_Fix_1 o) {
+			// TODO Auto-generated method stub
+
+			return 1;
+
+		}
 	}
 
 }

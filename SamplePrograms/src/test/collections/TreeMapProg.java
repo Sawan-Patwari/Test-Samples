@@ -16,7 +16,7 @@ public class TreeMapProg {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		test2();
+		test10();
 	}
 
 	public static void test1() {
@@ -447,12 +447,12 @@ class Employee_Fix implements Comparable<Employee_Fix> {
 			}
 		};
 
+		// wrote for testing purpose.
 		static Comparator<Employee_Fix> sortAscendingByAFieldWithoutDupeEntries = (e1, e2) -> {
-			if (e1.equals(e2)) {// this is needed to remove dupe elements after comparing all the fields of a
-								// class.
+			if (e1.equals(e2)) {// duplicate map entries are not added.
 				return 0;
 			} else {
-				if (e1.a == e2.a) {// this condition is needed for comparing further fields of a class.
+				if (e1.a == e2.a) {// map entries with same field 'a' values are not added.
 					return 0;
 				} else {
 					return sortAscendingByAFieldWithDupeEntries.compare(e1, e2);
@@ -468,12 +468,12 @@ class Employee_Fix implements Comparable<Employee_Fix> {
 			}
 		};
 
+		// wrote for testing purpose.
 		static Comparator<Employee_Fix> sortAscendingByBFieldWithoutDupeEntries = (e1, e2) -> {
-			if (e1.equals(e2)) {// this is needed to remove dupe elements after comparing all the fields of a
-								// class.
+			if (e1.equals(e2)) {// duplicate map entries are not added.
 				return 0;
 			} else {
-				if (e1.b == e2.b) {// this condition is needed for comparing further fields of a class.
+				if (e1.b == e2.b) {// map entries with same field 'b' values are not added.
 					return 0;
 				} else {
 					return sortAscendingByBFieldWithDupeEntries.compare(e1, e2);
@@ -489,15 +489,37 @@ class Employee_Fix implements Comparable<Employee_Fix> {
 			}
 		};
 
+		private static Comparator<Employee_Fix> compareFieldA = (e1, e2) -> {
+			//// Approach-1:
+			if (e1.a == e2.a) {
+				return 0;
+			} else if (e1.a < e2.a) {
+				return -1;
+			} else {
+				return 1;
+			}
+
+			// Approach-2:
+			// return e1.a - e2.a;
+
+			// Approach-3:
+			// return Integer.valueOf(e1.a).compareTo(Integer.valueOf(e2.a));
+		};
+
+		private static Comparator<Employee_Fix> compareFieldB = (e1, e2) -> {
+			return Integer.valueOf(e1.b).compareTo(Integer.valueOf(e2.b));
+		};
+
 		static Comparator<Employee_Fix> sortAscendingByAAndBFieldWithoutDupeEntries = (e1, e2) -> {
 			if (e1.equals(e2)) {
 				return 0;// This will disallow duplicate elements from entering the collection.
 			} else {
 
-				int val = sortAscendingByAFieldWithoutDupeEntries.compare(e1, e2);
+				int val = compareFieldA.compare(e1, e2);
 
 				if (val == 0) {
-					return sortAscendingByBFieldWithoutDupeEntries.compare(e1, e2);
+					return compareFieldB.compare(e1, e2);
+					// for any more fields comparison, the logic needs to be built here.
 				} else {
 					return val;
 				}
@@ -509,6 +531,8 @@ class Employee_Fix implements Comparable<Employee_Fix> {
 
 }
 
+// Testing Class without compareTo implementation, but with comparator for
+// adding objects in TreeMap.
 class Employee_Fix_1 {
 	int a;
 	int b;
