@@ -194,6 +194,16 @@ public class HashMapProg {
 		System.out.println(map.size());
 	}
 	
+	public static void test7_1() {
+		Map<Object, Object> map = new HashMap<>();
+		map.put(null, null);
+		map.put(null, null);
+		map.put(null, null);
+		map.put(null, null);
+		
+		System.out.println(map.size());
+	}
+	
 	public static void test8() {
 		//Compilation error.	
 		//Map<int, int> map = new HashMap<>();
