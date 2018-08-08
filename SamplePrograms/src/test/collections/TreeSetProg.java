@@ -89,6 +89,16 @@ public class TreeSetProg {
 		setSample.add(x);
 		setSample.add(x1);
 		setSample.add(x2);
+		
+		/*
+		 * TreeMap.put throws below exception as per API documentation. 
+		 
+			Exception in thread "main" java.lang.NullPointerException
+			at java.base/java.util.TreeMap.put(Unknown Source)
+			at java.base/java.util.TreeSet.add(Unknown Source)
+		*/
+		//setSample.add(null);
+		
 		System.out.println(setSample.size());
 		
 		setSample.forEach((m) -> {System.out.println(m.a + " " + m.b);});
