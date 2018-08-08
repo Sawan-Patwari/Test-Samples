@@ -25,6 +25,12 @@ class Test1{
 			}
 		}
 		
+		/**
+		 * No fixing the compilation issue, so that I can remember this compilation issue.
+		 * 
+		 * @author Sawan.Patwari
+		 *
+		 */
 		class Child extends Parent {
 			
 			public void test() {
