@@ -5,7 +5,7 @@ package general;
  * @author Sawan.Patwari
  *
  */
-public class CompilationIssuesTest {
+public class CompilationIssuesProg {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
